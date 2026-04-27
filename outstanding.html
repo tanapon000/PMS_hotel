@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ยอดค้างชำระ - Hotel PMS</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; color: #333; margin: 0; }
+        
+        /* แถบเมนู */
+        .top-nav-tabs { display: flex; background-color: #ffffff; border-bottom: 2px solid #e0e0e0; margin: -20px -20px 20px -20px; padding: 0 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow-x: auto; }
+        .tab-link { padding: 15px 25px; text-decoration: none; color: #666; font-weight: bold; font-size: 15px; border-bottom: 3px solid transparent; transition: all 0.3s ease; white-space: nowrap; }
+        .tab-link:hover { color: #2196F3; background-color: #f5f9ff; }
+        .tab-link.active { color: #e65100; border-bottom: 3px solid #e65100; background-color: #fff3e0; } /* ไฮไลท์สีส้มแดงให้เด่น */
+
+        .header-container { max-width: 1200px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* ตาราง */
+        .table-container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 12px 10px; text-align: center; }
+        th { background-color: #e65100; color: white; position: sticky; top: 0; }
+        
+        .row-hover:hover { background-color: #ffe0b2; cursor: pointer; }
+        
+        .summary-box { background: #fff3e0; border: 1px solid #ffcc80; padding: 15px; border-radius: 6px; display: inline-block; font-size: 16px; margin-bottom: 20px; border-left: 5px solid #e65100; }
+    </style>
+</head>
+<body>
+
+<nav class="top-nav-tabs">
+    <a href="booking.html" class="tab-link">⚡ จองด่วน / สร้างบิลใหม่</a>
+    <a href="dashboard_main.html" class="tab-link">📊 ตารางหลัก (ห้องพัก)</a>
+    <a href="dashboard_pay.html" class="tab-link">💰 ตารางจ่ายเงิน (ปิดกะ)</a>
+    <a href="guest_search.html" class="tab-link">🔍 ค้นหาผู้เข้าพัก</a>
+    <a href="maintenance.html" class="tab-link">🛠️ ปิดห้องซ่อม</a>
+    <a href="outstanding.html" class="tab-link active">ค้างชำระ (หนี้)</a>
+</nav>
+
+<div class="header-container">
+    <h2 style="margin: 0; color: #d84315;">🚨 รายการบิลเลยกำหนด Check-out และมียอดค้างชำระ</h2>
+</div>
+
+<div style="max-width: 1200px; margin: 0 auto;">
+    <div class="summary-box">
+        💰 ยอดหนี้ค้างชำระรวมทั้งหมด: <strong id="sumTotalDebt" style="color: #c62828; font-size: 20px;">0</strong> <strong>บาท</strong>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th style="text-align: left;">ชื่อลูกค้า</th>
+                <th>ห้องที่เข้าพัก</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>ราคาทั้งหมด</th>
+                <th>ยอดที่จ่ายแล้ว (มัดจำ+ชำระ)</th>
+                <th>ยอดค้างชำระ</th>
+            </tr>
+        </thead>
+        <tbody id="outstandingTableBody">
+            <tr><td colspan="8">⏳ กำลังตรวจสอบยอดค้างชำระ...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="supabase.js"></script>
+<script src="outstanding_script.js"></script>
+<script src="auth_guard.js"></script>
+</body>
+</html>

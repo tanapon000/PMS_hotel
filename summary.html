@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปยอดผู้บริหาร - Hotel PMS</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; color: #333; margin: 0; }
+        
+        /* แถบเมนูด้านบน */
+        .top-nav-tabs { display: flex; background-color: #ffffff; border-bottom: 2px solid #e0e0e0; margin: -20px -20px 20px -20px; padding: 0 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .tab-link { padding: 15px 25px; text-decoration: none; color: #666; font-weight: bold; font-size: 15px; border-bottom: 3px solid transparent; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .tab-link:hover { color: #2196F3; background-color: #f5f9ff; }
+        .tab-link.active { color: #2196F3; border-bottom: 3px solid #2196F3; background-color: #e3f2fd; }
+
+        /* ส่วนหัวและตัวเลือกวันที่ */
+        .header-container { max-width: 1200px; margin: 0 auto 20px auto; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .date-picker { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .btn-search { background: #2196F3; color: white; border: none; padding: 9px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        
+        /* กล่องสรุปยอด (Cards) */
+        .summary-cards { max-width: 1200px; margin: 0 auto 20px auto; display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid #ccc; }
+        .card-title { font-size: 12px; color: gray; margin-bottom: 5px; }
+        .card-value { font-size: 24px; font-weight: bold; }
+
+        /* ตารางช่องทางจอง */
+        .table-container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #f5f5f5; color: #333; }
+        tbody tr:hover { background-color: #e3f2fd; }
+
+        /* กล่อง Modal ดูรายละเอียด */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; width: 90%; max-width: 900px; margin: 50px auto; border-radius: 8px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-header { background: #2196F3; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
+        .close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<nav class="top-nav-tabs">
+    <a href="booking.html" class="tab-link">⚡ จองด่วน / สร้างบิลใหม่</a>
+    <a href="dashboard_main.html" class="tab-link">📊 ตารางหลัก (ห้องพัก)</a>
+    <a href="dashboard_pay.html" class="tab-link">💰 ตารางจ่ายเงิน (ปิดกะ)</a>
+    <a href="guest_search.html" class="tab-link">🔍 ค้นหาผู้เข้าพัก</a>
+    <a href="maintenance.html" class="tab-link">🛠️ ปิดห้องซ่อม</a>
+    <a href="outstanding.html" class="tab-link">ค้างชำระ (หนี้)</a>
+    <a href="summary.html" class="tab-link active">📈 สรุปยอดผู้บริหาร</a>
+    <a href="occupancy_chart.html" class="tab-link">กราฟ สรุปยอด </a>
+</nav>
+
+<div class="header-container">
+    <h2 style="margin: 0; color: #2c3e50;">📈 รายงานสรุปผลประกอบการ</h2>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div>
+            <label>ตั้งแต่: </label>
+            <input type="date" id="startDate" class="date-picker">
+        </div>
+        <div>
+            <label>ถึง: </label>
+            <input type="date" id="endDate" class="date-picker">
+        </div>
+        <button class="btn-search" onclick="loadManagerData()">🔍 ค้นหา</button>
+    </div>
+</div>
+
+<div class="summary-cards">
+    <div class="card" style="border-left-color: #4CAF50;">
+        <div class="card-title">💵 ยอดเงินสด</div>
+        <div class="card-value" style="color: #2e7d32;" id="mngCash">0</div>
+    </div>
+    <div class="card" style="border-left-color: #2196F3;">
+        <div class="card-title">🏦 ยอดเงินโอน</div>
+        <div class="card-value" style="color: #1565c0;" id="mngTransfer">0</div>
+    </div>
+    <div class="card" style="border-left-color: #9C27B0;">
+        <div class="card-title">💳 บัตรเครดิต</div>
+        <div class="card-value" style="color: #7b1fa2;" id="mngCredit">0</div>
+    </div>
+    <div class="card" style="border-left-color: #FF9800;">
+        <div class="card-title">📱 QR Code</div>
+        <div class="card-value" style="color: #e65100;" id="mngQr">0</div>
+    </div>
+    <div class="card" style="border-left-color: #607D8B; background-color: #f0f4f8;">
+        <div class="card-title">🌙 Room Nights (ห้องเข้าพัก)</div>
+        <div class="card-value" style="color: #37474f;" id="mngRoomNights">0</div>
+    </div>
+</div>
+
+<div class="table-container">
+    <h3 style="margin-top: 0; color: #555;">📊 สรุป Room Nights แยกตามช่องทางการจอง</h3>
+    <p style="font-size: 12px; color: gray; margin-top: -10px;">(คลิกที่แถวเพื่อดูรายละเอียดบิลในช่องทางนั้นๆ)</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 40%; text-align: left;">ช่องทางการจอง (Booking Channel)</th>
+                <th style="width: 20%;">✅ จำนวนห้องที่เช็คอินแล้ว (คืน)</th>
+                <th style="width: 20%;">❌ จำนวนห้องที่ไม่เช็คอิน (คืน)</th>
+                <th style="width: 20%;">รวม Room Nights (คืน)</th>
+            </tr>
+        </thead>
+        <tbody id="managerTableBody">
+            <tr><td colspan="4">กรุณากดค้นหาเพื่อดึงข้อมูล</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="header-container" style="margin-top: 40px; border-top: 4px solid #f44336; padding-top: 20px;">
+    <h2 style="margin: 0; color: #c62828;">📉 รายงานสรุปรายจ่าย</h2>
+</div>
+
+<div class="summary-cards">
+    <div class="card" style="border-left-color: #f44336; background-color: #fff8f8;">
+        <div class="card-title">💸 รายจ่ายทั้งหมด</div>
+        <div class="card-value" style="color: #c62828;" id="expTotal">0</div>
+    </div>
+    <div class="card" style="border-left-color: #4CAF50;">
+        <div class="card-title">💵 เงินสด</div>
+        <div class="card-value" id="expCash">0</div>
+    </div>
+    <div class="card" style="border-left-color: #2196F3;">
+        <div class="card-title">🏦 เงินโอน</div>
+        <div class="card-value" id="expTransfer">0</div>
+    </div>
+    <div class="card" style="border-left-color: #9C27B0;">
+        <div class="card-title">💳 บัตรเครดิต</div>
+        <div class="card-value" id="expCredit">0</div>
+    </div>
+    <div class="card" style="border-left-color: #FF9800;">
+        <div class="card-title">📱 QR Code</div>
+        <div class="card-value" id="expQr">0</div>
+    </div>
+</div>
+
+<div class="table-container" style="margin-bottom: 50px;">
+    <h3 style="margin-top: 0; color: #555;">📋 รายละเอียดรายการรายจ่าย</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">วันที่ (Transaction Date)</th>
+                <th style="width: 40%; text-align: left;">ชื่อรายจ่าย / รายการ</th>
+                <th style="width: 20%;">วิธีการจ่ายเงิน</th>
+                <th style="width: 20%;">จำนวนเงิน (บาท)</th>
+            </tr>
+        </thead>
+        <tbody id="expenseTableBody">
+            <tr><td colspan="4">กรุณากดค้นหาเพื่อดึงข้อมูล</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="channelModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 style="margin: 0;">🧾 รายการบิลของช่องทาง: <span id="modalChannelName"></span></h3>
+            <button class="close-btn" onclick="closeChannelModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <table style="font-size: 13px;">
+                <thead style="background: #eceff1;">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th style="text-align: left;">ชื่อลูกค้า</th>
+                        <th>OTA Ref</th>
+                        <th>วันที่เข้าพัก</th>
+                        <th>วันที่ออก</th>
+                        <th>ยอดค้างชำระ</th>
+                    </tr>
+                </thead>
+                <tbody id="modalTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script src="supabase.js"></script>
+<script src="summary_.js"></script>
+<script src="auth_guard.js"></script>
+</body>
+</html>

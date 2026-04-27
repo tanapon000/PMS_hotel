@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กราฟสรุปจำนวนห้องพัก - Hotel PMS</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; color: #333; margin: 0; }
+        
+        /* แถบเมนู */
+        .top-nav-tabs { display: flex; background-color: #ffffff; border-bottom: 2px solid #e0e0e0; margin: -20px -20px 20px -20px; padding: 0 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow-x: auto; }
+        .tab-link { padding: 15px 25px; text-decoration: none; color: #666; font-weight: bold; font-size: 15px; border-bottom: 3px solid transparent; transition: all 0.3s ease; white-space: nowrap; }
+        .tab-link:hover { color: #2196F3; background-color: #f5f9ff; }
+        .tab-link.active { color: #9C27B0; border-bottom: 3px solid #9C27B0; background-color: #f3e5f5; }
+
+        .header-container { max-width: 1200px; margin: 0 auto 20px auto; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .date-picker { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .btn-search { background: #9C27B0; color: white; border: none; padding: 9px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-search:hover { background: #7b1fa2; }
+
+        /* พื้นที่กราฟ */
+        .chart-container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        .summary-box { text-align: center; margin-bottom: 20px; font-size: 18px; color: #555; }
+        .legend-box { display: flex; justify-content: center; gap: 15px; margin-top: 20px; font-size: 12px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .color-box { width: 15px; height: 15px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<nav class="top-nav-tabs">
+    <a href="booking.html" class="tab-link">⚡ จองด่วน / สร้างบิลใหม่</a>
+    <a href="dashboard_main.html" class="tab-link">📊 ตารางหลัก (ห้องพัก)</a>
+    <a href="dashboard_pay.html" class="tab-link">💰 ตารางจ่ายเงิน (ปิดกะ)</a>
+    <a href="guest_search.html" class="tab-link">🔍 ค้นหาผู้เข้าพัก</a>
+    <a href="maintenance.html" class="tab-link">🛠️ ปิดห้องซ่อม</a>
+    <a href="outstanding.html" class="tab-link">ค้างชำระ (หนี้)</a>
+    <a href="summary.html" class="tab-link">📈 สรุปยอดผู้บริหาร</a>
+    <a href="occupancy_chart.html" class="tab-link active">กราฟ สรุปยอด </a>
+</nav>
+
+<div class="header-container">
+    <h2 style="margin: 0; color: #6a1b9a;">📊 กราฟสรุปจำนวนห้องที่เข้าพักรายวัน</h2>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div>
+            <label>ตั้งแต่: </label>
+            <input type="date" id="startDate" class="date-picker">
+        </div>
+        <div>
+            <label>ถึง: </label>
+            <input type="date" id="endDate" class="date-picker">
+        </div>
+        <button class="btn-search" onclick="loadChartData()">ดึงข้อมูล</button>
+    </div>
+</div>
+
+<div class="chart-container">
+    <div class="summary-box" id="chartSummary">
+        กรุณากดดึงข้อมูลเพื่อแสดงกราฟ
+    </div>
+    
+    <div style="position: relative; height: 50vh; width: 100%;">
+        <canvas id="occupancyChart"></canvas>
+    </div>
+
+    <div class="legend-box">
+        <div class="legend-item"><div class="color-box" style="background:#f44336;"></div> อาทิตย์</div>
+        <div class="legend-item"><div class="color-box" style="background:#fbc02d;"></div> จันทร์</div>
+        <div class="legend-item"><div class="color-box" style="background:#e91e63;"></div> อังคาร</div>
+        <div class="legend-item"><div class="color-box" style="background:#4caf50;"></div> พุธ</div>
+        <div class="legend-item"><div class="color-box" style="background:#ff9800;"></div> พฤหัสบดี</div>
+        <div class="legend-item"><div class="color-box" style="background:#2196f3;"></div> ศุกร์</div>
+        <div class="legend-item"><div class="color-box" style="background:#9c27b0;"></div> เสาร์</div>
+    </div>
+</div>
+
+<div class="chart-container" style="margin-top: 20px; margin-bottom: 50px;">
+    <h3 style="margin-top: 0; color: #555; text-align: center;">📊 ตารางค่าเฉลี่ยจำนวนห้องพักที่ขายได้ (แยกตามวันในสัปดาห์)</h3>
+    <table style="width: 100%; border-collapse: collapse; font-size: 16px; text-align: center; margin-top: 15px;">
+        <thead>
+            <tr>
+                <th style="border: 1px solid #ddd; padding: 12px; background: #fbc02d; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">จันทร์</th>
+                <th style="border: 1px solid #ddd; padding: 12px; background: #e91e63; color: #fff;">อังคาร</th>
+                <th style="border: 1px solid #ddd; padding: 12px; background: #4caf50; color: #fff;">พุธ</th>
+                <th style="border: 1px solid #ddd; padding: 12px; background: #ff9800; color: #fff;">พฤหัสบดี</th>
+                <th style="border: 1px solid #ddd; padding: 12px; background: #2196f3; color: #fff;">ศุกร์</th>
+                <th style="border: 1px solid #ddd; padding: 12px; background: #9c27b0; color: #fff;">เสาร์</th>
+                <th style="border: 1px solid #ddd; padding: 12px; background: #f44336; color: #fff;">อาทิตย์</th>
+            </tr>
+        </thead>
+        <tbody id="averageTableBody">
+            <tr>
+                <td colspan="7" style="border: 1px solid #ddd; padding: 20px; color: gray;">กำลังคำนวณค่าเฉลี่ย...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="supabase.js"></script>
+<script src="occupancy_chart_script.js"></script>
+<script src="auth_guard.js"></script>
+</body>
+</html>
