@@ -52,25 +52,45 @@ function autocomplete(inp, type) {
             // ดึงข้อมูลจากฐานข้อมูลตามประเภท
             let results = [];
             if (type === 'name') {
-                const { data } = await db.from('customers').select('name').ilike('name', `%${val}%`).limit(10);
-                results = (data || []).map(d => d.name);
+                // 🟢 1. ดึง phone พ่วงมาด้วย
+                const { data } = await db.from('customers').select('name, phone').ilike('name', `%${val}%`).limit(10);
+                // 🟢 2. เก็บเป็น Object (val = ค่าที่จะใส่ลงกล่อง, text = ค่าที่จะโชว์ให้เห็น)
+                results = (data || []).map(d => ({
+                    val: d.name,
+                    text: d.name + (d.phone ? ` (${d.phone})` : '')
+                }));
             } else if (type === 'booking_id') {
                 const { data } = await db.from('bookings').select('booking_id').textSearch('booking_id::text', `'${val}'`).limit(10);
-                results = (data || []).map(d => d.booking_id.toString());
+                results = (data || []).map(d => ({ val: d.booking_id.toString(), text: d.booking_id.toString() }));
             } else if (type === 'ota') {
                 const { data } = await db.from('bookings').select('ota_reference_number').ilike('ota_reference_number', `%${val}%`).limit(10);
-                results = (data || []).map(d => d.ota_reference_number).filter(Boolean);
+                results = (data || []).map(d => ({ val: d.ota_reference_number, text: d.ota_reference_number })).filter(d => d.val);
             }
 
-            // ลบข้อมูลที่ซ้ำกัน
-            results = [...new Set(results)];
+            // 🟢 ลบข้อมูลที่ซ้ำกัน (เช็คจาก value แทน)
+            const seen = new Set();
+            results = results.filter(item => {
+                if (seen.has(item.val)) return false;
+                seen.add(item.val);
+                return true;
+            });
 
             results.forEach(item => {
                 b = document.createElement("DIV");
-                b.innerHTML = `<strong>${item.substr(0, val.length)}</strong>${item.substr(val.length)}`;
-                b.innerHTML += `<input type='hidden' value='${item}'>`;
+                
+                // 🟢 3. ปรับวิธีไฮไลท์ตัวหนา ให้รองรับข้อความยาวๆ ที่มีเบอร์โทรต่อท้าย
+                const matchIndex = item.text.toLowerCase().indexOf(val.toLowerCase());
+                if (matchIndex >= 0) {
+                    b.innerHTML = item.text.substring(0, matchIndex) + 
+                                  `<strong>${item.text.substring(matchIndex, matchIndex + val.length)}</strong>` + 
+                                  item.text.substring(matchIndex + val.length);
+                } else {
+                    b.innerHTML = item.text;
+                }
+
+                b.innerHTML += `<input type='hidden' value='${item.val}'>`; // ซ่อนแค่ "ชื่อ" เอาไว้
                 b.addEventListener("click", function(e) {
-                    inp.value = this.getElementsByTagName("input")[0].value;
+                    inp.value = this.getElementsByTagName("input")[0].value; // ดึงแค่ชื่อไปใส่กล่อง
                     closeAllLists();
                     executeSearch(); // กดเลือกปุ๊บ ค้นหาให้เลย
                 });

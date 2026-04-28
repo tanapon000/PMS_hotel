@@ -81,7 +81,7 @@ async function loadDashboardData(selectedDate) {
                 booking_room_id, room_id, check_in_date, check_out_date, note,
                 bookings ( 
                     booking_id, customer_id, total_price, deposit_amount, remaining_amount, booking_channel, ota_reference_number, notes,
-                    customers ( name, phone, id_card_or_passport )
+                    customers ( customer_id, name, phone, id_card_or_passport )
                 ),
                 room_guests ( guest_name, passport_or_id, actual_check_in_time, actual_check_out_time, breakfast_code, is_primary )
             `)
@@ -440,6 +440,7 @@ async function saveGuestData() {
 // ส่วนของการเปิดบิลเก่า (ห้องที่มีคนพัก)
 // ==========================================
 let currentViewBookingId = null; // 🟢 เพิ่มตัวแปรสำหรับจำ Booking ID
+let currentCustomerId = null;
 function openViewBookingModal(encodedData) {
     const data = JSON.parse(decodeURIComponent(encodedData));
     const b = data.bookings;
@@ -452,7 +453,7 @@ function openViewBookingModal(encodedData) {
     };
 
     currentViewBookingId = b.booking_id; // เก็บ ID ไว้ใช้ตอนกดแก้ไข
-    
+    currentCustomerId = b.customers?.customer_id || null;
     document.getElementById('vbId').textContent = b.booking_id;
     
     // 🟢 1. เพิ่มการแสดงวันที่เช็คอิน - เช็คเอาท์ (ดึงมาจาก data)
@@ -581,4 +582,12 @@ function getBookingColor(bookingId) {
     const hue = (Number(bookingId) * 137) % 360; 
     // คืนค่าเป็นรหัสสี hsla พื้นหลังอ่อนๆ สบายตา
     return `hsla(${hue}, 70%, 92%, 0.8)`;
+}
+function goToEditCustomer() {
+    if (currentCustomerId) {
+        // วาร์ปไปหน้าต่างใหม่ พร้อมแนบรหัสลูกค้าไปที่ URL (เช่น edit_customer.html?id=123)
+        window.location.href = `edit_customer.html?id=${currentCustomerId}`;
+    } else {
+        alert("ไม่พบข้อมูลลูกค้าระบบนี้ (อาจเป็นบิลเก่าที่ไม่ได้ผูกชื่อไว้)");
+    }
 }

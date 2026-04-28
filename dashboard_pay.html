@@ -271,7 +271,11 @@
     <div style="font-size: 14px; line-height: 1.6; padding: 15px;">
         <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #4CAF50;">
             <p style="margin:0;"><strong>Booking ID:</strong> #<span id="vbId"></span></p>
-            <p style="margin:0;"><strong>ลูกค้า:</strong> <span id="vbName"></span> (<span id="vbPhone"></span>)</p>
+            <p> <b>ชื่อลูกค้า:</b> <span id="vbName">-</span> 
+                <button onclick="goToEditCustomer()" style="background:#2196F3; color:white; border:none; padding:2px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin-left:10px;">
+                    ✏️ แก้ไขข้อมูลลูกค้า</button>
+            </p>
+            <p style="margin:0;"><strong>โทร</strong> <span id="vbPhone"></span></p>
             <p style="margin:0;"><strong>ช่องทาง:</strong> <span id="vbChannel"></span></p>
             <p style="margin:0;"><strong>OTA Ref:</strong> <span id="vbRef"></span></p>
         </div>

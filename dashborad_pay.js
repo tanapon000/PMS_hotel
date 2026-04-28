@@ -107,7 +107,7 @@ async function loadRevenueData(selectedDate) {
                     booking_id, total_price, deposit_amount, deposit_payment_time, deposit_staff, deposit_payment_method,
                     remaining_amount, final_payment_time, payment_received_by_staff, final_payment_method,
                     booking_channel, ota_reference_number, notes,
-                    customers ( name )
+                    customers(customer_id, name, phone)
                 )
             `)
             .lte('check_in_date', selectedDate).gt('check_out_date', selectedDate);
@@ -578,7 +578,7 @@ async function saveOtherTransaction() {
 // ส่วนที่ 3: ระบบ Modal ดูรายละเอียดบิล (คลิกจากตารางซ้าย)
 // ==========================================
 let currentViewBookingId = null; 
-
+let currentCustomerId = null;
 // ฟังก์ชันแปลงข้อมูลในตารางฝั่งซ้าย ให้พร้อมโยนเข้า Modal 
 // (เช็คแล้วว่าบรรทัด tbody.innerHTML ในโค้ดก่อนหน้าได้ใส่ onclick="openViewBookingModal('${panelData}')" ไว้แล้ว)
 function openViewBookingModal(bookingId) {
@@ -607,6 +607,7 @@ function openViewBookingModal(bookingId) {
         }
 
         currentViewBookingId = b.booking_id;
+        currentCustomerId = b.customers?.customer_id || null;
 
         // 🟢 นำเลขห้องไปต่อท้าย Booking ID เลย เพื่อให้พนักงานเห็นชัดๆ
         document.getElementById('vbId').textContent = `${b.booking_id} (ห้อง: ${roomsStr})`;
@@ -801,3 +802,11 @@ async function deleteOtherTransaction(transactionId, createdAt) {
     }
 }
 
+function goToEditCustomer() {
+    if (currentCustomerId) {
+        // วาร์ปไปหน้าต่างใหม่ พร้อมแนบรหัสลูกค้าไปที่ URL (เช่น edit_customer.html?id=123)
+        window.location.href = `edit_customer.html?id=${currentCustomerId}`;
+    } else {
+        alert("ไม่พบข้อมูลลูกค้าระบบนี้ (อาจเป็นบิลเก่าที่ไม่ได้ผูกชื่อไว้)");
+    }
+}

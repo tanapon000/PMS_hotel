@@ -269,7 +269,12 @@
     <div style="padding: 10px;">
         <table style="width: 100%; border: none; text-align: left;">
             <tr><td width="30%"><strong>Booking ID:</strong></td><td>#<span id="vbId"></span></td></tr>
-            <tr><td><strong>ชื่อลูกค้า:</strong></td><td><span id="vbName"></span></td></tr>
+            <p>
+    <b>ชื่อลูกค้า:</b> <span id="vbName">-</span> 
+    <button onclick="goToEditCustomer()" style="background:#2196F3; color:white; border:none; padding:2px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin-left:10px;">
+        ✏️ แก้ไขข้อมูลลูกค้า
+    </button>
+</p>
             <tr><td><strong>เบอร์โทร:</strong></td><td><span id="vbPhone"></span></td></tr>
             <tr><td><strong>ช่องทางจอง:</strong></td><td><span id="vbChannel"></span></td></tr>
             <tr><td><strong>OTA Ref:</strong></td><td><span id="vbRef"></span></td></tr>
@@ -308,6 +313,7 @@
         <button type="button" class="btn-manage" style="width: 100%; margin-top: 20px; background: #2196F3; font-size: 16px; padding: 10px;" onclick="goToEditBooking()">✏️ แก้ไขการจองนี้</button>
         <button type="button" class="btn-save" style="margin-top: 10px; background: #9e9e9e;" onclick="closeViewBookingModal()">ปิดหน้าต่าง</button>
     </div>
+    
 </div>
 
 <div id="quickBookModal" class="side-panel" style="width: 450px;">
