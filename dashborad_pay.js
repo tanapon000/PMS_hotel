@@ -810,3 +810,11 @@ function goToEditCustomer() {
         alert("ไม่พบข้อมูลลูกค้าระบบนี้ (อาจเป็นบิลเก่าที่ไม่ได้ผูกชื่อไว้)");
     }
 }
+function goToFolio() {
+    if (currentViewBookingId) {
+        window.open(`folio.html?booking_id=${currentViewBookingId}`, '_blank');
+    } else {
+        // กรณีเปิดหน้าใหม่แบบไม่ระบุบิล
+        window.open(`folio.html`, '_blank');
+    }
+}
