@@ -162,7 +162,10 @@
                 <small id="searchResult" style="margin-top: 5px;"></small>
             </div>
             <div class="form-group">
-                <label>ชื่อ-นามสกุล ลูกค้า *</label>
+                <label>ชื่อ-นามสกุล ลูกค้า * <button type="button" id="btnEditCustomer" style="display: none; background:#2196F3; color:white; border:none; padding:2px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin-left:10px;" onclick="goToEditCustomerFromBooking()">
+                        ✏️ แก้ไขข้อมูลลูกค้า
+                    </button>
+                </label>
                 <input type="text" id="customerName" required>
             </div>
             <div class="form-group">

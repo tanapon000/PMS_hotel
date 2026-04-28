@@ -5,6 +5,7 @@
 
     let selectedRoomsList = []; // เก็บอาร์เรย์ของห้องที่เลือกในตาราง
     let editBookingId = null; // เก็บ ID บิลถ้าอยู่ในโหมดแก้ไข
+    let editCustomerId = null; // เก็บ ID ลูกค้าถ้าอยู่ในโหมดแก้ไข
     let deletedRoomIds = []; // เก็บ ID ห้องที่ถูกกดเครื่องหมายกากบาท (X) ลบออกตอนแก้ไข
     let returnUrl = "dashboard_main.html";
 
@@ -507,12 +508,12 @@ function calculateTotalPrice() {
     document.getElementById('totalPrice').value = sum;
     calculateRemaining();
 }
-    function updateRoom(index, field, value) {
+function updateRoom(index, field, value) {
         selectedRoomsList[index][field] = (field === 'extraBed') ? value : parseFloat(value) || 0;
         if(field === 'price') calculateTotalPrice();
-    }
+}
 
-    function removeRoom(index) {
+function removeRoom(index) {
     const room = selectedRoomsList[index];
     // ถ้าห้องนี้เป็นห้องที่เคยถูกบันทึกในฐานข้อมูลแล้ว ให้จำ ID เอาไว้ไปลบทิ้งตอนกดบันทึก
     if (room.isExisting) {
@@ -521,16 +522,16 @@ function calculateTotalPrice() {
     selectedRoomsList.splice(index, 1);
     renderTable();
     calculateTotalPrice();
-    }
+}
 
     // --- 5. ฟังก์ชันคำนวณการเงิน ---
 
-    function calculateRemaining() {
+function calculateRemaining() {
         let total = parseFloat(document.getElementById('totalPrice').value) || 0;
         let deposit = parseFloat(document.getElementById('depositAmount').value) || 0;
         let remaining = total - deposit;
         document.getElementById('remainingAmount').value = remaining < 0 ? 0 : remaining; // ห้ามติดลบ
-    }
+}
 
 // --- ฟังก์ชันสำหรับปิด Modal ---
 function closeRoomModal() {
@@ -584,7 +585,7 @@ async function loadEditData(bId) {
     const { data, error } = await db.from('bookings')
         .select(`
             *,
-            customers (name, phone),
+            customers (customer_id, name, phone),
             booking_rooms (booking_room_id, room_id, check_in_date, check_out_date, price_per_night, adult_count, child_count, extra_bed, rooms(room_types(type_name)))
         `)
         .eq('booking_id', bId)
@@ -598,7 +599,10 @@ async function loadEditData(bId) {
     // 3. หยอดข้อมูลลงฟอร์ม
     document.getElementById('customerName').value = data.customers.name;
     document.getElementById('customerPhone').value = data.customers.phone || '';
-    
+    editCustomerId = data.customers.customer_id;
+    if (editCustomerId) {
+        document.getElementById('btnEditCustomer').style.display = 'inline-block';
+    }
     document.getElementById('bookingChannel').value = data.booking_channel;
     document.getElementById('otaRef').value = data.ota_reference_number || '';
     document.getElementById('bookingNote').value = data.notes || '';
@@ -1087,6 +1091,19 @@ async function deleteBooking() {
         btn.disabled = false;
     }
 }
+
+// ==========================================
+// 🟢 ฟังก์ชันส่งไปหน้าแก้ไขข้อมูลลูกค้า (เปิดแท็บใหม่)
+// ==========================================
+function goToEditCustomerFromBooking() {
+    if (editCustomerId) {
+        // ใช้ _blank เพื่อเปิดหน้าต่างใหม่ ข้อมูลบิลหน้าเดิมจะได้ไม่หาย
+        window.open(`edit_customer.html?id=${editCustomerId}`, '_blank');
+    } else {
+        alert("ไม่พบข้อมูลลูกค้าในระบบครับ");
+    }
+}
+
 // 🟢 เมื่อมีการพิมพ์ตัวเลขในช่อง "ยอดมัดจำ"
 document.getElementById('depositAmount').addEventListener('input', function() {
     const dateInput = document.getElementById('depositDate');
@@ -1112,6 +1129,7 @@ document.getElementById('paymentAmount').addEventListener('input', function() {
         dateInput.value = '';
     }
 });
+
 
 // 🟢 ฟังก์ชันคำนวณและดักจับเวลา
 function validatePaymentTime(inputElement) {
