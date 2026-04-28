@@ -123,15 +123,15 @@
         <b>ที่อยู่ (Address)</b>
         <div><input type="text" id="custAddress" placeholder="ที่อยู่..."></div>
         
-        <div style="grid-column: 1 / span 2; display: grid; grid-template-columns: 100px 1.5fr 80px 1fr; gap: 5px; align-items: center;">
-            <b>Tax ID:</b>
+        <div style="grid-column: 1 / span 2; display: grid; grid-template-columns: 200px 0.97fr 80px 1fr; gap: 5px; align-items: center;">
+            <b>เลขประจำตัวผู้เสียภาษี (Tax ID):</b>
             <input type="text" id="custTaxId" placeholder="เลขประจำตัวผู้เสียภาษี">
             <b style="text-align: right;">เลขที่ (No.):</b>
             <input type="text" id="folioNumber" readonly style="color:red; text-align: left;">
         </div>
 
-        <div style="grid-column: 1 / span 2; display: grid; grid-template-columns: 100px 1.5fr 80px 1fr; gap: 5px; align-items: center;">
-            <b>Tel:</b>
+        <div style="grid-column: 1 / span 2; display: grid; grid-template-columns: 200px 1.0fr 80px 1fr; gap: 5px; align-items: center;">
+            <b>โทรศัพท์: </b>
             <input type="text" id="custTel">
             <b style="text-align: right;">วันที่ (Date):</b>
             <input type="date" id="issueDate">
@@ -141,14 +141,14 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 35px;">No.</th>
-                <th style="width: 60px;">Room No.</th>
-                <th style="width: 80px;">Room type</th>
-                <th>Name</th>
-                <th style="width: 70px;">Room rate</th>
-                <th style="width: 75px;">Arrival</th>
-                <th style="width: 75px;">Departure</th>
-                <th style="width: 80px;">Total price</th>
+                <th style="width: 40px;">ลำดับที่<br>No.</th>
+                <th style="width: 50px;">เลขห้อง<br>Room No.</th>
+                <th style="width: 60px;">ประเภทห้อง<br>Room type</th>
+                <th>ชื่อ-สกุลผู้เข้าพัก<br>Name</th>
+                <th style="width: 60px;">ราคาต่อคืน<br>Room rate</th>
+                <th style="width: 75px;">วันที่เข้าพัก<br>Arrival</th>
+                <th style="width: 75px;">วันที่ออก<br>Departure</th>
+                <th style="width: 80px;">ราคารวม<br>Total price</th>
                 <th class="no-print" style="width: 30px;">ลบ</th>
             </tr>
         </thead>
