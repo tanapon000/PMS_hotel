@@ -1,0 +1,79 @@
+table_name,column_name,data_type,column_default,constraint_type
+booking_rooms,booking_room_id,integer,nextval('booking_rooms_booking_room_id_seq'::regclass),PRIMARY KEY
+booking_rooms,booking_id,integer,null,FOREIGN KEY
+booking_rooms,room_id,integer,null,FOREIGN KEY
+booking_rooms,check_in_date,date,null,null
+booking_rooms,check_out_date,date,null,null
+booking_rooms,price_per_night,numeric,null,null
+booking_rooms,adult_count,integer,1,null
+booking_rooms,child_count,integer,0,null
+booking_rooms,extra_bed,boolean,false,null
+booking_rooms,note,text,null,null
+bookings,booking_id,integer,nextval('bookings_booking_id_seq'::regclass),PRIMARY KEY
+bookings,customer_id,integer,null,FOREIGN KEY
+bookings,booking_channel,text,'Walk-in'::text,null
+bookings,ota_reference_number,character varying,null,null
+bookings,total_price,numeric,null,null
+bookings,deposit_amount,numeric,0.00,null
+bookings,deposit_payment_time,timestamp with time zone,null,null
+bookings,deposit_payment_method,text,null,null
+bookings,deposit_staff,integer,null,FOREIGN KEY
+bookings,remaining_amount,numeric,0.00,null
+bookings,final_payment_method,text,null,null
+bookings,final_payment_time,timestamp with time zone,null,null
+bookings,payment_received_by_staff,integer,null,FOREIGN KEY
+bookings,booking_status,text,'Confirmed'::text,null
+bookings,notes,text,null,null
+bookings,created_at,timestamp with time zone,now(),null
+bookings,refund_amount,double precision,'0'::double precision,null
+bookings,refund_method,text,null,null
+customers,customer_id,integer,nextval('customers_customer_id_seq'::regclass),PRIMARY KEY
+customers,name,character varying,null,null
+customers,id_card_or_passport,character varying,null,null
+customers,phone,character varying,null,null
+customers,email,character varying,null,null
+customers,address,text,null,null
+customers,created_at,timestamp with time zone,now(),null
+maintenance_rooms,id,uuid,gen_random_uuid(),PRIMARY KEY
+maintenance_rooms,room_id,integer,null,FOREIGN KEY
+maintenance_rooms,start_date,date,null,null
+maintenance_rooms,end_date,date,null,null
+maintenance_rooms,reason,text,null,null
+maintenance_rooms,created_at,timestamp with time zone,now(),null
+other_transactions,transaction_id,uuid,gen_random_uuid(),PRIMARY KEY
+other_transactions,transaction_date,date,CURRENT_DATE,null
+other_transactions,transaction_type,text,null,null
+other_transactions,category,text,null,null
+other_transactions,amount,numeric,null,null
+other_transactions,payment_method,text,null,null
+other_transactions,note,text,null,null
+other_transactions,staff_id,integer,null,null
+other_transactions,created_at,timestamp with time zone,now(),null
+room_guests,guest_id,integer,nextval('room_guests_guest_id_seq'::regclass),PRIMARY KEY
+room_guests,booking_room_id,integer,null,FOREIGN KEY
+room_guests,guest_name,character varying,null,null
+room_guests,passport_or_id,character varying,null,null
+room_guests,actual_check_in_time,timestamp with time zone,null,null
+room_guests,actual_check_out_time,timestamp with time zone,null,null
+room_guests,created_at,timestamp with time zone,now(),null
+room_guests,is_primary,boolean,false,null
+room_guests,breakfast_code,text,null,null
+room_rates,room_rate_id,integer,nextval('room_rates_room_rate_id_seq'::regclass),PRIMARY KEY
+room_rates,type_id,integer,null,FOREIGN KEY
+room_rates,rate_name,character varying,null,null
+room_rates,start_date,date,null,null
+room_rates,end_date,date,null,null
+room_rates,specific_day_of_week,integer,null,null
+room_rates,priority,integer,0,null
+room_rates,price,numeric,null,null
+room_types,room_type_id,integer,nextval('room_types_room_type_id_seq'::regclass),PRIMARY KEY
+room_types,type_name,character varying,null,null
+room_types,description,text,null,null
+rooms,room_id,integer,null,PRIMARY KEY
+rooms,type_id,integer,null,FOREIGN KEY
+rooms,status,text,'available'::text,null
+staffs,staff_id,integer,nextval('staffs_staff_id_seq'::regclass),PRIMARY KEY
+staffs,staff_name,character varying,null,null
+staffs,role,text,'Receptionist'::text,null
+staffs,phone,character varying,null,null
+staffs,is_active,boolean,true,null
