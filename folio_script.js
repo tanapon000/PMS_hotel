@@ -8,14 +8,59 @@ const targetBookingId = urlParams.get('booking_id');
 
 document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('issueDate').valueAsDate = new Date();
-    await generateFolioNumber();
 
     if (targetBookingId) {
-        await loadDataFromBooking(targetBookingId);
+        // 🟢 เช็คว่าบิลนี้เคยออก Folio ไปแล้วหรือยัง?
+        const { data: existingFolio, error } = await db.from('folios')
+            .select('*')
+            .eq('booking_id', targetBookingId)
+            .single();
+
+        if (existingFolio) {
+            // ถ้าเคยออกแล้ว ให้ดึงข้อมูลเดิมมาแสดง
+            loadExistingFolio(existingFolio);
+        } else {
+            // ถ้ายังไม่เคยออก ให้รันเลขใหม่และดึงข้อมูลจากการจอง
+            await generateFolioNumber();
+            await loadDataFromBooking(targetBookingId);
+        }
     } else {
+        await generateFolioNumber();
         addTableRow(); // สร้างแถวว่าง 1 แถวถ้าเปิดบิลใหม่
     }
 });
+
+// 🟢 โหลดข้อมูล Folio เก่าที่เคยบันทึกไว้
+function loadExistingFolio(f) {
+    document.getElementById('folioNumber').value = f.folio_number;
+    document.getElementById('custName').value = f.customer_name || '';
+    document.getElementById('custAddress').value = f.customer_address || '';
+    document.getElementById('custTaxId').value = f.customer_tax_id || '';
+    document.getElementById('custTel').value = f.customer_tel || '';
+    if (f.issue_date) document.getElementById('issueDate').value = f.issue_date;
+
+    // นำรายการห้องพักมาใส่ในตาราง
+    const tbody = document.getElementById('folioTableBody');
+    tbody.innerHTML = '';
+    const items = f.items || [];
+    
+    items.forEach(item => {
+        addTableRow({
+            roomNo: item.room_no,
+            roomType: item.room_type,
+            guests: item.guest_names,
+            rate: item.room_rate,
+            arr: item.arrival,
+            dep: item.departure,
+            total: item.total_price
+        });
+    });
+
+    if (items.length === 0) addTableRow();
+
+    document.getElementById('valDiscount').value = f.discount || 0;
+    calculateTotal(); // คำนวณยอดรวมใหม่
+}
 
 // 🟢 สร้างเลขที่เอกสารอัตโนมัติ (เช่น 2567-001)
 async function generateFolioNumber() {
@@ -37,7 +82,7 @@ async function generateFolioNumber() {
     document.getElementById('folioNumber').value = `${yearThai}-${nextNum.toString().padStart(3, '0')}`;
 }
 
-// 🟢 โหลดข้อมูลบิลและการจอง
+// 🟢 โหลดข้อมูลบิลและการจอง (ถ้าเพิ่งเปิดบิลครั้งแรก)
 async function loadDataFromBooking(bId) {
     const { data, error } = await db.from('bookings')
         .select(`
@@ -122,7 +167,6 @@ function addTableRow(d = {}) {
 }
 
 function updateRowTotal(el) {
-    // สมมติพัก 1 คืน ถ้าจะให้คำนวณคืนด้วย ต้องแปลงวันที่ แต่เพื่อความยืดหยุ่นให้พนักงานแก้ราคารวมเอาเองดีกว่า
     const row = el.closest('tr');
     const rate = parseFloat(row.querySelector('.t-rate').value) || 0;
     row.querySelector('.t-total').value = rate; 
@@ -165,7 +209,7 @@ function calculateTotal() {
     document.getElementById('thaiBahtText').innerText = ArabicNumberToText(grandTotal.toFixed(2));
 }
 
-// 🟢 บันทึกและสั่ง Print
+// 🟢 บันทึกและสั่ง Print (ระบบรองรับการเซฟทับ)
 async function saveAndPrint() {
     const btn = document.querySelector('.btn-green');
     btn.textContent = "⏳ กำลังบันทึก...";
@@ -201,7 +245,7 @@ async function saveAndPrint() {
     };
 
     try {
-        // บันทึกแบบ Upsert (ถ้าย้อนกลับมาแก้บิลเดิม จะได้ทับของเดิม)
+        // บันทึกแบบ Upsert ถ้า folio_number ตรงกันจะทำการ Update ทับของเดิม
         const { error } = await db.from('folios').upsert(payload, { onConflict: 'folio_number' });
         if (error) throw error;
         

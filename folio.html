@@ -6,21 +6,23 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <style>
         /* ตั้งค่าหน้ากระดาษ A4 */
         body { font-family: 'Kanit', sans-serif; background: #e0e0e0; margin: 0; padding: 20px; font-size: 13px; color: #000; font-weight: 300; }
         .page { background: white; width: 210mm; min-height: 297mm; padding: 12mm; margin: 0 auto; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
         
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .header-center { text-align: center; flex: 1; }
-        .header-center h1 { margin: 0; font-size: 20px; font-weight: 500; }
-        .header-center h3 { margin: 2px 0 0 0; font-size: 14px; font-weight: 300; }
+        /* 🟢 ปรับปรุง Header โลโก้และชื่อชิดซ้าย */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 15px; }
+        .header-left { display: flex; align-items: center; flex: 1; }
+        .header-left img { width: 75px; height: auto; display: block; }
+        .header-left-text { margin-left: 15px; text-align: left; font-style: italic; }
+        .header-left-text h1 { margin: 0; font-size: 32px; font-weight: 700; line-height: 1.1; letter-spacing: 0.5px; }
+        .header-left-text h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 400; letter-spacing: 0.5px; }
         .header-right { text-align: right; }
-        .header-right h2 { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.2; }
+        .header-right h2 { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2; }
 
         .info-box { border: 1px solid #000; padding: 8px; margin-bottom: 8px; display: grid; grid-template-columns: 100px 1fr; gap: 5px; align-items: center; }
-        /* ปรับให้บรรทัด Tax ID ยาวและ Folio No อยู่ด้วยกัน */
         .info-box-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; }
         
         input, textarea, select { font-family: 'Kanit', sans-serif; width: 100%; border: 1px solid #ddd; padding: 2px 5px; font-size: 13px; box-sizing: border-box; background: #fdfdfd; font-weight: 300; }
@@ -34,6 +36,11 @@
         td input, td textarea { text-align: center; border: none; background: transparent; padding: 0; margin: 0; font-weight: 300; }
         td textarea.ta-left { text-align: left; padding-left: 3px; }
         
+        /* บังคับให้ช่องราคาชิดขวา */
+        .t-rate, .t-total { text-align: right !important; padding-right: 4px !important; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
         .signature-box { display: flex; justify-content: flex-end; margin-top: 30px; text-align: center; }
         .signature-box div { width: 220px; }
         .signature-box p { margin: 2px 0; }
@@ -45,25 +52,14 @@
         .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit; }
         .btn-blue { background: #2196F3; color: white; }
         .btn-green { background: #4CAF50; color: white; }
-        /* บังคับให้ช่องราคาและราคารวมชิดขวา */
-        .t-rate, .t-total {text-align: right !important; padding-right: 2px !important;}
 
-        /* ซ่อนปุ่มลูกศรของ input type="number" เพื่อให้ตัวเลขชิดขอบจริงๆ */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
         @media print {
             body { background: white; padding: 0; }
             .page { box-shadow: none; border: none; margin: 0; width: 100%; padding: 10mm; }
             .toolbar, .no-print { display: none !important; }
             input, textarea, select { border: none !important; background: transparent !important; color: #000; }
+            td input.t-total, td input.t-rate { text-align: right !important; width: 100%; padding-right: 4px !important; }
             th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            /* สั่งให้พื้นหลังช่องสรุปยอดติดสีเทาตอนปริ้น */
             .bg-gray { background-color: #eeeeee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
@@ -87,12 +83,12 @@
 
 <div class="page">
     <div class="header">
-        <div style="width: 120px;">
-            <img src="logo.png" alt="Hotel Logo" style="width: 100%; height: auto; display: block;">
-        </div>
-        <div class="header-center">
-            <h1>หจก. สมายเพลส 2016</h1>
-            <h3>SMILE PLACE 2016</h3>
+        <div class="header-left">
+            <img src="logo.png" alt="Hotel Logo">
+            <div class="header-left-text">
+                <h1>หจก. สมายเพลส 2016</h1>
+                <h3>SMILE PLACE 2016</h3>
+            </div>
         </div>
         <div class="header-right">
             <h2>ใบแจ้งรายการโรงแรม<br>(FOLIO)</h2>
@@ -123,15 +119,15 @@
         <b>ที่อยู่ (Address)</b>
         <div><input type="text" id="custAddress" placeholder="ที่อยู่..."></div>
         
-        <div style="grid-column: 1 / span 2; display: grid; grid-template-columns: 200px 0.97fr 80px 1fr; gap: 5px; align-items: center;">
-            <b>เลขประจำตัวผู้เสียภาษี (Tax ID):</b>
+        <div style="grid-column: 1 / span 2; display: grid; grid-template-columns: 100px 1.5fr 80px 1fr; gap: 5px; align-items: center;">
+            <b>Tax ID:</b>
             <input type="text" id="custTaxId" placeholder="เลขประจำตัวผู้เสียภาษี">
             <b style="text-align: right;">เลขที่ (No.):</b>
             <input type="text" id="folioNumber" readonly style="color:red; text-align: left;">
         </div>
 
-        <div style="grid-column: 1 / span 2; display: grid; grid-template-columns: 200px 1.0fr 80px 1fr; gap: 5px; align-items: center;">
-            <b>โทรศัพท์: </b>
+        <div style="grid-column: 1 / span 2; display: grid; grid-template-columns: 100px 1.5fr 80px 1fr; gap: 5px; align-items: center;">
+            <b>Tel:</b>
             <input type="text" id="custTel">
             <b style="text-align: right;">วันที่ (Date):</b>
             <input type="date" id="issueDate">
