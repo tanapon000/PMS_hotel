@@ -39,8 +39,6 @@
             border-bottom: 3px solid #2196F3;
             background-color: #e3f2fd;
         }
-    /* จบnav css */
-
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; color: #333; margin: 0; }
         .header-container {  margin-bottom: 20px; max-width: 800px;margin: 0; }
@@ -52,12 +50,11 @@
         table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap;margin-top:5px; }
         th, td { border: 1px solid #ddd; padding: 2px 2px; text-align: center}
         th { background-color: #4CAF50; color: white; position: sticky; top: 0; padding: 8px 6px}
-        /* 🟢 ชุดโค้ดล็อคขนาดคอลัมน์ (อัปเดตบีบขนาดให้เล็กลง) */
-        th.col-booking, td.col-booking { width: 40px; max-width: 60px; font-size: 9px; white-space: normal; word-wrap: break-word; } /* ลดขนาด ID */
-        th.col-channel, td.col-channel { width: 55px; max-width: 65px; font-size: 9px; overflow: hidden; text-overflow: ellipsis; }
-        th.col-ref, td.col-ref { width: 60px; max-width: 60px; font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } /* ลดขนาดเลขที่การจอง */
         
-        /* 🟢 เพิ่มคลาสใหม่สำหรับล็อคขนาดยอดค้างจ่าย */
+        th.col-booking, td.col-booking { width: 40px; max-width: 60px; font-size: 9px; white-space: normal; word-wrap: break-word; } 
+        th.col-channel, td.col-channel { width: 55px; max-width: 65px; font-size: 9px; overflow: hidden; text-overflow: ellipsis; }
+        th.col-ref, td.col-ref { width: 60px; max-width: 60px; font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } 
+        
         th.col-pending, td.col-pending { width: 60px; max-width: 60px; font-size: 11px; } 
         th.col-type, td.col-type { width: 40px; max-width: 50px; font-size: 9px; }
         th.col-time, td.col-time { width: 65px; max-width: 65px; font-size: 11px; }
@@ -66,12 +63,11 @@
         tbody tr:nth-child(even) { background-color: #f9f9f9; } 
         tbody tr:hover { filter: brightness(0.95); }
         
-        /* จัดขนาดคอลัมน์ไม่ให้กว้างเกินไป */
         .col-money { width: 70px; font-weight: bold; }
         .col-staff { width: 80px; font-size: 11px; color: #555; }
         .col-date { width: 100px; font-size: 11px; color: #555; }
         .col-note { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-style: italic; }
-        /* 🟢 สไตล์หน้าต่าง Modal ด้านข้าง */
+        
         .side-panel {
             height: 100%; width: 400px; position: fixed; z-index: 1000; top: 0; right: 0;
             transform: translateX(100%); background-color: #fff; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
@@ -84,11 +80,18 @@
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; }
         
         /* ปุ่มใน Modal */
-        .btn-edit { background: #ff9800; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; margin-top: 20px; }
+        .btn-edit { background: #ff9800; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; margin-top: 10px; }
         .btn-edit:hover { background: #e68a00; }
-        .date-nav-btn {background-color: #e3f2fd; color: #1565c0; /* ตัวหนังสือสีฟ้าเข้ม */border: 1px solid #90caf9;padding: 8px 12px;border-radius: 4px;cursor: pointer;font-size: 14px;font-weight: bold;transition: all 0.2s ease;}
+        /* 🟢 สไตล์ปุ่ม Folio (ม่วง) */
+        .btn-folio { background: #9C27B0; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; margin-top: 10px; }
+        .btn-folio:hover { background: #7B1FA2; }
+        /* 🟢 สไตล์ปุ่ม Invoice (เขียวอมฟ้า) */
+        .btn-invoice { background: #009688; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; margin-top: 10px; }
+        .btn-invoice:hover { background: #00796B; }
+        
+        .date-nav-btn {background-color: #e3f2fd; color: #1565c0; border: 1px solid #90caf9;padding: 8px 12px;border-radius: 4px;cursor: pointer;font-size: 14px;font-weight: bold;transition: all 0.2s ease;}
         .date-nav-btn:hover {background-color: #2196F3;color: white;}
-        .date-nav-btn:active {transform: scale(0.95); /* เอฟเฟกต์ปุ่มยุบตอนกด */}
+        .date-nav-btn:active {transform: scale(0.95); }
     </style> 
 </head>
 <body>
@@ -134,10 +137,11 @@
                     <th class="col-type" style="background:#bbdefb; color:#000;">ช่องทางชำระ</th> <th style="background:#64b5f6; color:#000;">วันที่ชำระ</th>
                     <th style="background:#64b5f6; color:#000;">ผู้รับเงิน</th>
                     <th>Note (บิล)</th>
+                    <th>สถานะบิล</th>
                 </tr>
             </thead>
             <tbody id="revenueTableBody">
-                <tr><td colspan="14">⏳ กำลังดึงข้อมูล...</td></tr>
+                <tr><td colspan="17">⏳ กำลังดึงข้อมูล...</td></tr>
             </tbody>
         </table>
     </div>
@@ -270,7 +274,7 @@
     </div>
     <div style="font-size: 14px; line-height: 1.6; padding: 15px;">
         <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #4CAF50;">
-            <p style="margin:0;"><strong>Booking ID:</strong> #<span id="vbId"></span></p>
+            <p style="margin:0;"><strong>Booking ID:</strong> <span id="vbId"></span></p>
             <p> <b>ชื่อลูกค้า:</b> <span id="vbName">-</span> 
                 <button onclick="goToEditCustomer()" style="background:#2196F3; color:white; border:none; padding:2px 8px; border-radius:4px; font-size:11px; cursor:pointer; margin-left:10px;">
                     ✏️ แก้ไขข้อมูลลูกค้า</button>
@@ -284,7 +288,6 @@
                 <span style="font-size: 14px;">📅 <b>เช็คอิน:</b> <span id="vbCheckIn" style="color: #1565c0; font-weight: bold;">-</span></span>
                 <span style="font-size: 14px;">📅 <b>เช็คเอาท์:</b> <span id="vbCheckOut" style="color: #1565c0; font-weight: bold;">-</span></span>
             </div>
-        
         </div>
         
         <h4 style="margin: 10px 0 5px 0; color: #555;">💰 ข้อมูลการเงิน</h4>
@@ -304,9 +307,11 @@
             </div>
         </div>
 
-        
-        <button type="button" class="btn-edit" style="background: #ff9800; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; margin-top: 20px;" onclick="goToEditBooking()">✏️ แก้ไข / จัดการบิลนี้</button>
-        <button type="button" class="btn-manage" style="width: 100%; margin-top: 10px; background: #9C27B0; font-size: 16px; padding: 10px; color: white;" onclick="goToFolio()">📄 ออกใบแจ้งรายการ (Folio)</button>
+        <button type="button" class="btn-edit" onclick="goToEditBooking()">✏️ แก้ไข / จัดการบิลนี้</button>
+        <!-- 🟢 ปุ่ม Folio (กลับมาแล้ว!) -->
+        <button type="button" class="btn-folio" onclick="goToFolio()">📄 ออกใบแจ้งรายการ (Folio)</button>
+        <!-- 🟢 พื้นที่สำหรับแสดงปุ่มออกใบกำกับภาษี -->
+        <div id="invoiceActionArea" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;"></div>
     </div>
 </div>
 
