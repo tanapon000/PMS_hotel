@@ -54,8 +54,15 @@
         .btn-green { background: #4CAF50; color: white; }
 
         @media print {
-            body { background: white; padding: 0; }
-            .page { box-shadow: none; border: none; margin: 0; width: 100%; padding: 10mm; }
+            /* 🟢 1. สั่งลบขอบกระดาษอัตโนมัติของเบราว์เซอร์ทิ้ง */
+            @page { margin: 5mm; } 
+
+            /* 🟢 2. เพิ่ม margin: 0; เพื่อล้างขอบซ่อนเร้น */
+            body { background: white; padding: 0; margin: 0; }
+            
+            /* 🟢 3. เพิ่ม min-height: auto; เพื่อไม่ให้มันบังคับความสูงจนล้นหน้า */
+            .page { box-shadow: none; border: none; margin: 0; width: 100%; min-height: auto; padding: 10mm; }
+            
             .toolbar, .no-print { display: none !important; }
             input, textarea, select { border: none !important; background: transparent !important; color: #000; }
             td input.t-total, td input.t-rate { text-align: right !important; width: 100%; padding-right: 4px !important; }
