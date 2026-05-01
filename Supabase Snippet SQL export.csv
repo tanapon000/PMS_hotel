@@ -34,6 +34,21 @@ customers,phone,character varying,null,null
 customers,email,character varying,null,null
 customers,address,text,null,null
 customers,created_at,timestamp with time zone,now(),null
+folios,id,uuid,gen_random_uuid(),PRIMARY KEY
+folios,folio_number,character varying,null,null
+folios,booking_id,integer,null,null
+folios,customer_name,character varying,null,null
+folios,customer_address,text,null,null
+folios,customer_tax_id,character varying,null,null
+folios,customer_tel,character varying,null,null
+folios,customer_email,character varying,null,null
+folios,issue_date,date,CURRENT_DATE,null
+folios,items,jsonb,'[]'::jsonb,null
+folios,subtotal,numeric,0,null
+folios,vat_amount,numeric,0,null
+folios,discount,numeric,0,null
+folios,grand_total,numeric,0,null
+folios,created_at,timestamp with time zone,now(),null
 maintenance_rooms,id,uuid,gen_random_uuid(),PRIMARY KEY
 maintenance_rooms,room_id,integer,null,FOREIGN KEY
 maintenance_rooms,start_date,date,null,null
