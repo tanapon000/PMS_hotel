@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// ส่วนที่ 1: ตารางรายรับหลักฝั่งซ้าย (ย้อนกลับเป็นแบบแยกห้องเหมือนเดิม)
+// ส่วนที่ 1: ตารางรายรับหลักฝั่งซ้าย
 // ==========================================
 let bookingCache = {};
 let bookingRoomCache = {}; 
@@ -66,7 +66,6 @@ async function loadRevenueData(selectedDate) {
     try {
         const { data: allRooms } = await db.from('rooms').select('room_id').order('room_id', { ascending: true });
         
-        // 🟢 ดึงข้อมูล invoices เชื่อมจาก bookings เพื่อให้ดึงสถานะบิลได้
         const { data: bookingsToday } = await db.from('booking_rooms')
             .select(`
                 booking_room_id, room_id, check_in_date, check_out_date,
@@ -137,7 +136,7 @@ async function loadRevenueData(selectedDate) {
                 let totalDisp = "-", depDisp = "-", depDateTxt = "-", depStaff = "-", depMethodDisp = "-";
                 let payDisp = "-", payDateTxt = "-", payStaff = "-", payMethodDisp = "-", balDisp = "-", noteDisp = "-";
                 let depDateStyle = "", payDateStyle = ""; 
-                let invStatus = "-"; // เก็บสถานะบิล
+                let invStatus = "-";
 
                 const relatedRooms = (bookingsToday || []).filter(item => item.bookings?.booking_id === bId);
                 const roomCount = relatedRooms.length;
@@ -149,10 +148,8 @@ async function loadRevenueData(selectedDate) {
                 if (isMultiRoom) {
                     const rowColor = getBookingColor(bId); 
                     trStyle = `style="cursor: pointer; background-color: ${rowColor} !important;"`;
-                    // ไม่โชว์ป้ายหลายห้องที่ชื่อ ID ตามที่คุณแจ้งมา
                 }
 
-                // 🟢 แสดงผลข้อมูลการเงินและบิลเฉพาะห้องแรกสุดของการจอง
                 if (!priceShown.has(bId)) {
                     const total = parseFloat(bk.total_price) || 0;
                     const deposit = parseFloat(bk.deposit_amount) || 0;
@@ -204,7 +201,6 @@ async function loadRevenueData(selectedDate) {
                     payStaff = safeStaffMap[bk.payment_received_by_staff] || '-';
                     noteDisp = bk.notes || '-';
                     
-                    // เช็คสถานะการออกใบกำกับภาษี (โชว์เฉพาะแถวแรก)
                     if (bk.invoices && bk.invoices.length > 0) {
                         const type = bk.invoices[0].invoice_type;
                         invStatus = type === 'TAX' 
@@ -214,7 +210,6 @@ async function loadRevenueData(selectedDate) {
 
                     priceShown.add(bId);
                 } else {
-                    // 🟢 ถ้าเป็นห้องที่ 2, 3... ในบิลเดียวกัน ให้ซ่อนข้อมูลและบิล เพื่อความสะอาดตา
                     totalDisp = `<span style="color:#ccc; font-size:10px;">(รวมใน #${bId})</span>`;
                     invStatus = "-";
                 }
@@ -412,6 +407,14 @@ async function loadOtherTransactions(selectedDate) {
     renderSummaryBox(); 
 }
 
+// 🟢 ฟังก์ชันสำหรับอัปเดตข้อมูลบนหน้าจอใหม่ทั้งหมด
+function refreshDashboard() {
+    const selectedDate = document.getElementById('revenueDate').value;
+    if (selectedDate) {
+        loadAllData(selectedDate);
+    }
+}
+
 function openOtPanel(type) {
     document.getElementById('otType').value = type;
     document.getElementById('otPanelTitle').textContent = type === 'Income' ? '🟢 เพิ่มรายรับอื่นๆ' : '🔴 เพิ่มรายจ่ายอื่นๆ';
@@ -425,6 +428,7 @@ function openOtPanel(type) {
 function closeOtPanel() {
     document.getElementById('otPanel').classList.remove('open');
     document.getElementById('otOverlay').style.display = 'none';
+    refreshDashboard(); // รีเฟรชเมื่อปิด
 }
 
 async function saveOtherTransaction() {
@@ -458,11 +462,7 @@ async function saveOtherTransaction() {
         closeOtPanel();
         document.getElementById('otCategory').value = '';
         document.getElementById('otAmount').value = '';
-        if (typeof loadAllData === 'function') {
-            loadAllData(date); 
-        } else {
-            loadOtherTransactions(date);
-        }
+        // closeOtPanel() จะทำการรีเฟรชให้อัตโนมัติอยู่แล้ว
     } catch (error) {
         console.error("Save OT Error:", error);
         alert("❌ เกิดข้อผิดพลาดในการบันทึก: " + error.message);
@@ -486,7 +486,6 @@ function openViewBookingModal(bookingId) {
             data = bookingCache[bookingId];
             b = data.bookings;
             
-            // 🟢 ดึงรหัสห้องทั้งหมดที่เป็นของ Booking นี้มาโชว์ในบิล
             roomsStr = (b.booking_rooms || []).map(r => r.room_id).join(', ');
             checkInStr = (b.booking_rooms && b.booking_rooms.length > 0) ? b.booking_rooms[0].check_in_date : '-';
             checkOutStr = (b.booking_rooms && b.booking_rooms.length > 0) ? b.booking_rooms[0].check_out_date : '-';
@@ -579,6 +578,7 @@ function openQuickBookModal(roomId) {
 function closeQuickBookModal() {
     document.getElementById('quickBookModal').classList.remove('open');
     document.getElementById('panelOverlay').style.display = 'none';
+    refreshDashboard(); // รีเฟรชเมื่อปิด
 }
 
 function goToFullBooking() {
@@ -590,6 +590,7 @@ function goToFullBooking() {
 function closeViewBookingModal() {
     document.getElementById('viewBookingModal').classList.remove('open');
     document.getElementById('panelOverlay').style.display = 'none';
+    refreshDashboard(); // รีเฟรชเมื่อปิด
 }
 
 function goToEditBooking() {
@@ -598,15 +599,24 @@ function goToEditBooking() {
     }
 }
 
+// 🟢 สั่งรีเฟรชเมื่อกดปิด Modal หรือกดที่ Overlay สีดำ
 function closeAllSidePanels() {
     const viewModal = document.getElementById('viewBookingModal');
     if (viewModal) viewModal.classList.remove('open');
 
     const qbModal = document.getElementById('quickBookModal');
     if (qbModal) qbModal.classList.remove('open');
+    
+    const otModal = document.getElementById('otPanel');
+    if (otModal) otModal.classList.remove('open');
 
     const overlay = document.getElementById('panelOverlay');
     if (overlay) overlay.style.display = 'none';
+    
+    const otOverlay = document.getElementById('otOverlay');
+    if (otOverlay) otOverlay.style.display = 'none';
+
+    refreshDashboard(); // สั่งโหลดข้อมูลใหม่ให้เป็นปัจจุบันทันที
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -632,12 +642,7 @@ async function deleteOtherTransaction(transactionId, createdAt) {
             .eq('transaction_id', transactionId); 
 
         if (error) throw error;
-        const selectedDate = document.getElementById('revenueDate').value;
-        if (typeof loadAllData === 'function') {
-            loadAllData(selectedDate);
-        } else {
-            loadOtherTransactions(selectedDate);
-        }
+        refreshDashboard();
 
     } catch (error) {
         console.error("Delete OT Error:", error);
