@@ -8,72 +8,64 @@
         body { font-family: 'Sarabun', sans-serif; background: #e0e0e0; margin: 0; padding: 20px; color: #000; }
         .page { background: white; width: 210mm; min-height: 297mm; padding: 15mm; margin: 0 auto; box-sizing: border-box; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         
-        /* Toolbar ซ่อนตอนปริ้น */
         .toolbar { max-width: 210mm; margin: 0 auto 10px auto; background: #fff; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .no-print { display: flex; gap: 10px; }
+        .no-print { display: flex; gap: 10px; align-items: center; }
         .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit; font-size: 14px; }
         .btn-blue { background: #2196F3; color: white; }
         .btn-green { background: #4CAF50; color: white; }
+        .btn-red { background: #f44336; color: white; padding: 2px 8px; font-size: 12px; }
         
-        /* สไตล์เอกสาร */
         .header { display: flex; align-items: flex-start; margin-bottom: 20px; }
-        .logo { width: 100px; height: 100px; object-fit: contain; margin-right: 20px; }
+        .logo { width: 120px; height: 120px; object-fit: contain; margin-right: 20px; }
         .company-info h2 { margin: 0 0 5px 0; font-size: 22px; }
         .company-info p { margin: 2px 0; font-size: 14px; }
         
-        .doc-title { text-align: center; border: 1px solid #000; padding: 5px 15px; font-weight: bold; display: inline-block; margin-bottom: 30px; font-size: 14px; }
+        .doc-title { text-align: center; border: 1px solid #000; padding: 5px 15px; font-weight: bold; display: inline-block; margin-bottom: 10px; font-size: 13px; }
+        .row-inline { display: flex; align-items: baseline; margin-bottom: 8px; font-size: 14px; white-space: nowrap; }
         
-        .row-inline { display: flex; align-items: baseline; margin-bottom: 8px; font-size: 15px; white-space: nowrap; }
-        
-        /* 🟢 เปลี่ยนเป็นกล่องกรอกข้อมูลสีฟ้าให้เห็นชัดเจน */
-        .data-input { 
-            border: 1px solid #90caf9; 
-            background: #f5f9ff; 
-            font-family: inherit; 
-            font-size: 15px; 
-            padding: 4px 8px; 
-            border-radius: 4px; 
-            flex-grow: 1; 
-            margin: 0 5px; 
-            min-width: 0;
-            outline: none;
-        }
+        .data-input { border: 1px solid #90caf9; background: #f5f9ff; font-family: inherit; font-size: 14px; padding: 4px 8px; border-radius: 4px; flex-grow: 1; margin: 0 5px; min-width: 0; outline: none; }
         .data-input:focus { border-color: #2196F3; background: #fff; }
         .data-input:disabled { background: #eee; border-color: #ccc; color: #333; }
         
-        .main-table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid #000; }
-        .main-table th { border: 1px solid #000; padding: 10px; font-size: 16px; font-style: italic; background: #fdfdfd; }
-        .main-table td { padding: 8px; vertical-align: bottom; }
+        .main-table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid #000; text-align: center; }
+        .main-table th { border: 1px solid #000; padding: 6px; font-size: 13px; background: #fdfdfd; }
+        .main-table td { border: 1px solid #000; padding: 3px; vertical-align: middle; }
+        .main-table td input { text-align: center; border: none; background: transparent; padding: 4px; font-family: inherit; font-size: 12px; width: 100%; box-sizing: border-box; }
+        .main-table td input.ta-left { text-align: left; }
         
-        .baht-text { background: #eee; padding: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
+        .main-table tfoot td { font-size: 13px; padding: 6px 10px; }
+        .main-table tfoot td textarea { font-size: 13px; }
         
-        .signatures { display: flex; justify-content: space-between; margin-top: 60px; text-align: center; }
+        .baht-text { background: #eee; padding: 8px; text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px;}
+        .signatures { display: flex; justify-content: space-between; margin-top: 40px; text-align: center; }
         .sig-box { width: 45%; }
         
         #lockWarning { display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-weight: bold; text-align: center; }
 
         @media print {
-            /* 🟢 1. สั่งลบขอบกระดาษอัตโนมัติของเบราว์เซอร์ทิ้ง */
             @page { margin: 5mm; } 
-            
             body { background: white; padding: 0; margin: 0; }
-            
-            /* 🟢 2. เพิ่ม min-height: auto; เพื่อไม่ให้มันบังคับความสูงจนล้นหน้า */
             .page { box-shadow: none; margin: 0; width: 100%; min-height: auto; padding: 10mm; }
-            
             .toolbar, .no-print, #lockWarning { display: none !important; }
-            .baht-text { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .baht-text, th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .data-input { border: none !important; border-bottom: 1px dotted #000 !important; background: transparent !important; border-radius: 0 !important; padding: 0 5px !important; }
             ::-webkit-input-placeholder { color: transparent; }
         }
-        
     </style>
 </head>
 <body>
 
 <div class="toolbar no-print">
-    <div><h3 style="margin:0; color:#1565c0;">ระบบออกเอกสาร (ห้อง <span id="hdrRoom"></span>)</h3></div>
+    <div>
+        <h3 style="margin:0; color:#1565c0; display: inline-block;">ระบบออกเอกสาร</h3>
+        <button class="btn btn-blue" onclick="addTableRow()" style="margin-left: 15px; font-size: 12px; padding: 4px 10px;">+ เพิ่มแถว</button>
+    </div>
     <div class="no-print">
+        <!-- 🟢 ปุ่มสลับภาษา -->
+        <select id="langSelect" style="padding: 8px; font-family: inherit; border-radius: 4px; margin-right: 5px;" onchange="toggleLanguage()">
+            <option value="TH">🇹🇭 ภาษาไทย</option>
+            <option value="EN">🇬🇧 English</option>
+        </select>
         <select id="docType" style="padding: 8px; font-family: inherit; border-radius: 4px;">
             <option value="CASH">บิลเงินสด (Cash Receipt)</option>
             <option value="TAX">ใบกำกับภาษี (Tax Invoice)</option>
@@ -86,31 +78,31 @@
 <div id="lockWarning">🔒 เอกสารนี้ถูกล็อกเนื่องจากออกเกิน 24 ชั่วโมงแล้ว (ไม่สามารถแก้ไขได้)</div>
 
 <div class="page">
-    <div style="text-align: right; margin-bottom: -15px;">
+    <div style="text-align: right; margin-bottom: 5px;">
         <div class="doc-title" id="displayDocTitle">ใบเสร็จรับเงิน / ใบกำกับภาษี (RECEIPT / TAX INVOICE)</div>
     </div>
     
     <div class="header">
         <img src="logo.png" alt="Logo" class="logo">
         <div class="company-info">
-            <h2>ห้างหุ้นส่วนจำกัด สมายเพลส 2016 (สำนักงานใหญ่)</h2>
-            <p>เลขที่ 209/38-39 หมู่ 2 ต.ดอยแก้ว อ.จอมทอง จ.เชียงใหม่ 50160</p>
-            <p>โทร. 053-341155, 065-7538313, 064-3322345</p>
-            <p>เลขประจำตัวผู้เสียภาษีอากร 0503559002660</p>
+            <h2 id="compName">ห้างหุ้นส่วนจำกัด สมายเพลส 2016 (สำนักงานใหญ่)</h2>
+            <p id="compAddr">เลขที่ 209/38-39 หมู่ 2 ต.ดอยแก้ว อ.จอมทอง จ.เชียงใหม่ 50160</p>
+            <p id="compTel">โทร. 053-341155, 065-7538313, 064-3322345</p>
+            <p id="compTax">เลขประจำตัวผู้เสียภาษีอากร 0503559002660</p>
         </div>
     </div>
 
     <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
         <div class="row-inline" style="width: 350px;">
-            เลขที่เอกสาร: <input type="text" id="invNumber" class="data-input" readonly>
+            <span id="lblInvNo">เลขที่เอกสาร / No.:</span> <input type="text" id="invNumber" class="data-input" readonly>
         </div>
     </div>
 
     <div style="display: flex; justify-content: center; margin-bottom: 20px;">
         <div class="row-inline" style="width: 80%;">
-            วันที่<input type="text" id="invDay" class="data-input" style="width:50px; flex-grow:0; text-align:center;">
-            เดือน<input type="text" id="invMonth" class="data-input" style="width:150px; flex-grow:0; text-align:center;">
-            พ.ศ.<input type="text" id="invYear" class="data-input" style="width:80px; flex-grow:0; text-align:center;">
+            <span id="lblDate">วันที่</span><input type="text" id="invDay" class="data-input" style="width:50px; flex-grow:0; text-align:center;">
+            <span id="lblMonth">เดือน</span><input type="text" id="invMonth" class="data-input" style="width:150px; flex-grow:0; text-align:center;">
+            <span id="lblYear">พ.ศ.</span><input type="text" id="invYear" class="data-input" style="width:80px; flex-grow:0; text-align:center;">
         </div>
     </div>
 
@@ -127,64 +119,51 @@
 
     <table class="main-table">
         <thead>
-            <tr><th colspan="2">รายละเอียดการเข้าพัก</th></tr>
+            <tr>
+                <th id="thNo" style="width: 5%;">ลำดับ</th>
+                <th id="thItem" style="width: 35%;">รายการ</th>
+                <th id="thCheckIn" style="width: 14%;">เช็คอิน</th>
+                <th id="thCheckOut" style="width: 14%;">เช็คเอาท์</th>
+                <th id="thNights" style="width: 8%;">คืน</th>
+                <th id="thRooms" style="width: 8%;">ห้อง</th>
+                <th id="thAmount" style="width: 16%;">จำนวนเงิน</th>
+                <th id="thDelete" class="no-print" style="width: 5%;">ลบ</th>
+            </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td colspan="2"><div class="row-inline" style="margin-bottom:0;">ชำระค่าห้องพักเลขที่ <input type="text" id="roomNo" class="data-input"></div></td>
-            </tr>
-            <tr>
-                <td colspan="2"><div class="row-inline" style="margin-bottom:0;">
-                    เข้าพักตั้งแต่วันที่ <input type="text" id="checkIn" class="data-input" style="text-align:center;">
-                    ถึงวันที่ <input type="text" id="checkOut" class="data-input" style="text-align:center;">
-                </div></td>
-            </tr>
-            <tr>
-                <td colspan="2"><div class="row-inline" style="margin-bottom:0;">
-                    รวมเข้าพักทั้งหมด <input type="number" id="nights" class="data-input" style="width:70px; flex-grow:0; text-align:center;" oninput="calcTotal()"> คืน
-                    ราคาคืนละ <input type="number" id="pricePerNight" class="data-input" style="text-align:center;" oninput="calcTotal()"> บาท
-                </div></td>
-            </tr>
-            <tr>
-                <td colspan="2"><div class="row-inline" style="margin-bottom:0;">ค่าใช้จ่ายอื่นๆ <input type="number" id="otherCharges" class="data-input" value="0" style="text-align:right;" oninput="calcTotal()"> บาท</div></td>
-            </tr>
-            <tr>
-                <td colspan="2"><div class="row-inline" style="margin-bottom:0;">รวมเป็นเงินทั้งหมด <input type="text" id="grandTotalText" class="data-input" readonly style="text-align:right;"> บาท</div></td>
-            </tr>
-            <tr>
-                <td style="width: 60%; border-top: 1px solid #000; padding-top: 15px;">
-                    <span style="font-style: italic;">หมายเหตุ / Remark:</span><br>
-                    <textarea id="remark" class="data-input" style="width: 100%; resize:none; margin-top:5px; margin-left:0;" rows="3"></textarea>
-                </td>
-                <td style="width: 40%; border-top: 1px solid #000; padding: 0;">
-                    <!-- 🟢 เปลี่ยนตารางสรุปยอดให้เป็น Table เพื่อให้ล็อกความกว้างและอยู่บรรทัดเดียวกันแน่นอน -->
-                    <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
-                        <tr>
-                            <td style="text-align: right; padding: 6px 10px;">รวมจำนวนเงิน / Subtotal</td>
-                            <td style="border-left: 1px solid #000; border-bottom: 1px solid #000; width: 120px; text-align: right; padding: 6px 10px;" id="valSubtotal">0.00</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: right; padding: 6px 10px;">ภาษีมูลค่าเพิ่ม / VAT (7%)</td>
-                            <td style="border-left: 1px solid #000; border-bottom: 1px solid #000; text-align: right; padding: 6px 10px;" id="valVat">0.00</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: right; padding: 6px 10px;">รวมทั้งสิ้น / Total</td>
-                            <td style="border-left: 1px solid #000; text-align: right; padding: 6px 10px; font-weight: bold;" id="valGrandTotal">0.00</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
+        <tbody id="invoiceItemsBody">
+            <!-- ข้อมูลจาก JS จะมาแทรกตรงนี้ -->
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" rowspan="3" style="text-align: left; vertical-align: top; padding: 10px;">
+                    <span style="font-style: italic; font-weight: bold;" id="lblRemark">หมายเหตุ / Remark:</span><br>
+                    <textarea id="remark" class="data-input" style="width: 100%; border:none; resize:none; margin-top:5px; background: transparent;" rows="3"></textarea>
+                </td>
+                <td colspan="2" style="text-align: right; padding-right: 10px;">รวมจำนวนเงิน / Subtotal</td>
+                <td style="text-align: right; padding-right: 10px;" id="valSubtotal">0.00</td>
+                <td class="no-print"></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: right; padding-right: 10px;">ภาษีมูลค่าเพิ่ม / VAT (7%)</td>
+                <td style="text-align: right; padding-right: 10px;" id="valVat">0.00</td>
+                <td class="no-print"></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: right; padding-right: 10px; font-weight: bold;">รวมทั้งสิ้น / Total</td>
+                <td style="text-align: right; padding-right: 10px; font-weight: bold; background: #f5f5f5;" id="valGrandTotal">0.00</td>
+                <td class="no-print"></td>
+            </tr>
+        </tfoot>
     </table>
 
     <div class="row-inline" style="margin-top: 10px;">
-        (ตัวอักษร) <div class="baht-text" id="thaiBahtText" style="flex-grow: 1; margin-left: 10px;">ศูนย์บาทถ้วน</div>
+        <span id="lblTextAmt">(ตัวอักษร / In words)</span> <div class="baht-text" id="thaiBahtText" style="flex-grow: 1; margin-left: 10px;">ศูนย์บาทถ้วน</div>
     </div>
 
     <div class="signatures">
         <div class="sig-box">
             <div class="row-inline" style="justify-content: center;">
-                ลงชื่อ <input type="text" id="custSignature" class="data-input" style="width: 150px; flex-grow:0; text-align:center;">
+                <span class="lblSign">ลงชื่อ</span> <input type="text" id="custSignature" class="data-input" style="width: 150px; flex-grow:0; text-align:center;">
             </div>
             <div class="row-inline" style="justify-content: center;">
                 วันที่ / Date <input type="text" id="custSignDate" class="data-input" style="width: 150px; flex-grow:0; text-align:center;">
@@ -192,7 +171,7 @@
         </div>
         <div class="sig-box">
             <div class="row-inline" style="justify-content: center;">
-                ลงชื่อ <input type="text" id="staffSignature" class="data-input" style="width: 150px; flex-grow:0; text-align:center;"> ผู้รับเงิน
+                <span class="lblSign">ลงชื่อ</span> <input type="text" id="staffSignature" class="data-input" style="width: 150px; flex-grow:0; text-align:center;"> <span class="lblCollector">ผู้รับเงิน</span>
             </div>
             <div class="row-inline" style="justify-content: center;">
                 วันที่ / Date <input type="text" id="staffSignDate" class="data-input" style="width: 150px; flex-grow:0; text-align:center;">

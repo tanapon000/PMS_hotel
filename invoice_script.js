@@ -1,20 +1,20 @@
 // --- ตั้งค่า Supabase ---
-const SUPABASE_URL = 'http://192.168.2.200:8000'; // เปลี่ยนเป็นของคุณ
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE'; // เปลี่ยนเป็นของคุณ
+const SUPABASE_URL = 'http://192.168.2.200:8000'; // ⚠️ เปลี่ยนเป็นของคุณ
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE'; // ⚠️ เปลี่ยนเป็นของคุณ
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const urlParams = new URLSearchParams(window.location.search);
-const bRoomId = urlParams.get('br_id');
+const bId = urlParams.get('b_id'); 
 let currentInvoiceId = null;
+let currentIssueDate = new Date(); // เก็บวันที่เอกสารไว้เพื่อใช้ตอนเปลี่ยนภาษา
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!bRoomId) return alert("ไม่พบข้อมูลอ้างอิงห้องพัก");
+    if (!bId) return alert("ไม่พบข้อมูลอ้างอิง Booking");
 
-    // 1. เช็คว่าห้องนี้เคยออกบิลไปแล้วหรือยัง
-    const { data: existingInv } = await db.from('invoices').select('*').eq('booking_room_id', bRoomId).single();
+    // เช็คว่า Booking นี้เคยออกบิลไปแล้วหรือยัง
+    const { data: existingInv } = await db.from('invoices').select('*').eq('booking_id', bId).single();
 
     if (existingInv) {
-        // 🟢 มีบิลเก่า โหลดข้อมูลมาแสดง
         currentInvoiceId = existingInv.invoice_id;
         document.getElementById('docType').value = existingInv.invoice_type;
         document.getElementById('invNumber').value = existingInv.invoice_number;
@@ -22,16 +22,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('custAddress').value = existingInv.customer_address || '';
         document.getElementById('custTaxId').value = existingInv.customer_tax_id || '';
         document.getElementById('custTel').value = existingInv.customer_tel || '';
-        document.getElementById('roomNo').value = existingInv.room_number || '';
         document.getElementById('remark').value = existingInv.note || '';
         
-        fillDateInputs(new Date(existingInv.created_at));
+        currentIssueDate = new Date(existingInv.created_at);
+        fillDateInputs(currentIssueDate);
         
-        document.getElementById('checkIn').value = formatDate(existingInv.check_in_date);
-        document.getElementById('checkOut').value = formatDate(existingInv.check_out_date);
-        document.getElementById('nights').value = existingInv.nights || 0;
-        document.getElementById('pricePerNight').value = existingInv.price_per_night || 0;
-        document.getElementById('otherCharges').value = existingInv.other_charges || 0;
+        // โหลดข้อมูลตาราง
+        if (existingInv.items && existingInv.items.length > 0) {
+            existingInv.items.forEach(item => addTableRow(item));
+        } else {
+            addTableRow(); // แถวว่าง
+        }
 
         calcTotal();
 
@@ -40,43 +41,174 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (hoursPassed > 24) {
             document.getElementById('lockWarning').style.display = 'block';
             document.getElementById('btnSave').style.display = 'none';
-            document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+            document.querySelectorAll('input, select, textarea, button').forEach(el => {
+                if(el.id !== 'btnSave' && el.innerText !== '🖨️ พิมพ์ (Print)' && el.id !== 'langSelect') el.disabled = true;
+            });
         }
 
     } else {
-        // 🟢 ยังไม่เคยมีบิล ให้ดึงข้อมูลจากการจองมาเตรียมไว้
-        const { data: bData } = await db.from('booking_rooms')
-            .select('room_id, check_in_date, check_out_date, price_per_night, bookings(booking_id, customers(name, address, id_card_or_passport, phone))')
-            .eq('booking_room_id', bRoomId).single();
+        // ดึงข้อมูลใหม่จาก Booking และจัดกลุ่ม
+        const { data: bData } = await db.from('bookings')
+            .select(`
+                booking_id, customers(name, address, id_card_or_passport, phone),
+                booking_rooms( room_id, check_in_date, check_out_date, price_per_night, rooms(room_types(type_name)) )
+            `)
+            .eq('booking_id', bId).single();
 
         if (bData) {
-            const cust = bData.bookings?.customers || {};
+            const cust = bData.customers || {};
             document.getElementById('custName').value = cust.name || '';
             document.getElementById('custAddress').value = cust.address || '';
             document.getElementById('custTaxId').value = cust.id_card_or_passport || '';
             document.getElementById('custTel').value = cust.phone || '';
-            document.getElementById('roomNo').value = bData.room_id || '';
-            document.getElementById('checkIn').value = formatDate(bData.check_in_date);
-            document.getElementById('checkOut').value = formatDate(bData.check_out_date);
             
-            const start = new Date(bData.check_in_date);
-            const end = new Date(bData.check_out_date);
-            const nights = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24));
-            
-            document.getElementById('nights').value = nights;
-            document.getElementById('pricePerNight').value = bData.price_per_night;
-            
-            fillDateInputs(new Date());
+            // 🟢 ระบบยุบรวมห้อง (Grouping)
+            let itemsMap = {};
+            (bData.booking_rooms || []).forEach(r => {
+                let typeName = r.rooms?.room_types?.type_name || 'ห้องพัก';
+                let key = `${typeName}_${r.check_in_date}_${r.check_out_date}_${r.price_per_night}`;
+                
+                if(!itemsMap[key]) {
+                    const start = new Date(r.check_in_date);
+                    const end = new Date(r.check_out_date);
+                    const nights = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) || 1;
+                    
+                    itemsMap[key] = {
+                        desc: `ค่าห้องพัก (${typeName})`,
+                        in: formatDate(r.check_in_date),
+                        out: formatDate(r.check_out_date),
+                        nights: nights,
+                        qty: 0,
+                        price: parseFloat(r.price_per_night)
+                    };
+                }
+                itemsMap[key].qty += 1;
+            });
+
+            // สร้างแถวตามกลุ่มข้อมูล
+            Object.values(itemsMap).forEach(item => {
+                item.total = item.qty * item.nights * item.price;
+                addTableRow(item);
+            });
+
+            currentIssueDate = new Date();
+            fillDateInputs(currentIssueDate);
             generateInvoiceNumber();
             calcTotal();
         }
     }
-    
-    // อัปเดตหัวเอกสารตามประเภท
-    updateDocTitle();
+    toggleLanguage(); // ตรวจสอบและตั้งค่าภาษาเริ่มต้น
 });
 
-// จัดการเปลี่ยนหัวเอกสาร
+// 🟢 ฟังก์ชันเปลี่ยนภาษา (อัปเดตแปลชนิดห้องอัตโนมัติ)
+function toggleLanguage() {
+    const lang = document.getElementById('langSelect').value;
+    
+    if (lang === 'EN') {
+        document.getElementById('compName').innerText = "Smile Place 2016 LTD. (Head Office)";
+        document.getElementById('compAddr').innerText = "209/38-39 Moo 2, T. Doi Kaeo, A. Chom Thong, Chiang Mai 50160";
+        document.getElementById('compTel').innerText = "Tel. 053-341155, 065-7538313, 064-3322345";
+        document.getElementById('compTax').innerText = "Tax ID: 0503559002660";
+
+        document.getElementById('lblDate').innerText = "Date";
+        document.getElementById('lblMonth').innerText = "Month";
+        document.getElementById('lblYear').innerText = "Year";
+
+        document.getElementById('thNo').innerText = "No.";
+        document.getElementById('thItem').innerText = "Description";
+        document.getElementById('thCheckIn').innerText = "Check-in";
+        document.getElementById('thCheckOut').innerText = "Check-out";
+        document.getElementById('thNights').innerText = "Nights";
+        document.getElementById('thRooms').innerText = "Qty";
+        document.getElementById('thAmount').innerText = "Amount";
+        document.getElementById('thDelete').innerText = "Del";
+        
+        document.getElementById('lblRemark').innerText = "Remark:";
+        document.getElementById('lblTextAmt').innerText = "(In words)";
+        
+        document.querySelectorAll('.lblSign').forEach(el => el.innerText = "Sign");
+        document.querySelectorAll('.lblCollector').forEach(el => el.innerText = "Collector");
+        
+    } else {
+        document.getElementById('compName').innerText = "ห้างหุ้นส่วนจำกัด สมายเพลส 2016 (สำนักงานใหญ่)";
+        document.getElementById('compAddr').innerText = "เลขที่ 209/38-39 หมู่ 2 ต.ดอยแก้ว อ.จอมทอง จ.เชียงใหม่ 50160";
+        document.getElementById('compTel').innerText = "โทร. 053-341155, 065-7538313, 064-3322345";
+        document.getElementById('compTax').innerText = "เลขประจำตัวผู้เสียภาษีอากร 0503559002660";
+
+        document.getElementById('lblDate').innerText = "วันที่";
+        document.getElementById('lblMonth').innerText = "เดือน";
+        document.getElementById('lblYear').innerText = "พ.ศ.";
+
+        document.getElementById('thNo').innerText = "ลำดับ";
+        document.getElementById('thItem').innerText = "รายการ";
+        document.getElementById('thCheckIn').innerText = "เช็คอิน";
+        document.getElementById('thCheckOut').innerText = "เช็คเอาท์";
+        document.getElementById('thNights').innerText = "คืน";
+        document.getElementById('thRooms').innerText = "ห้อง";
+        document.getElementById('thAmount').innerText = "จำนวนเงิน";
+        document.getElementById('thDelete').innerText = "ลบ";
+        
+        document.getElementById('lblRemark').innerText = "หมายเหตุ / Remark:";
+        document.getElementById('lblTextAmt').innerText = "(ตัวอักษร / In words)";
+        
+        document.querySelectorAll('.lblSign').forEach(el => el.innerText = "ลงชื่อ");
+        document.querySelectorAll('.lblCollector').forEach(el => el.innerText = "ผู้รับเงิน");
+    }
+    
+    // 🟢 ระบบแปลภาษาชนิดห้องในตาราง
+    document.querySelectorAll('.i-desc').forEach(input => {
+        let text = input.value;
+        if (lang === 'EN') {
+            text = text.replace(/ค่าห้องพัก/g, 'Room Charge');
+            text = text.replace(/เตียงเดี่ยว/g, 'Single beds room');
+            text = text.replace(/เตียงคู่/g, 'Double bed room');
+            text = text.replace(/ห้องแอร์/g, 'Air-con room');
+            text = text.replace(/ห้องพัดลม/g, 'Fan room');
+            text = text.replace(/ห้องครอบครัว/g, 'Family room');
+            text = text.replace(/ห้องพัก/g, 'Room');
+        } else {
+            text = text.replace(/Room Charge/ig, 'ค่าห้องพัก');
+            text = text.replace(/Single beds room/ig, 'เตียงเดี่ยว');
+            text = text.replace(/Double bed room/ig, 'เตียงคู่');
+            text = text.replace(/Air-con room/ig, 'ห้องแอร์');
+            text = text.replace(/Fan room/ig, 'ห้องพัดลม');
+            text = text.replace(/Family room/ig, 'ห้องครอบครัว');
+            text = text.replace(/Room/ig, 'ห้องพัก');
+        }
+        input.value = text;
+    });
+    
+    updateDocTitle();
+    fillDateInputs(currentIssueDate); 
+}
+
+function addTableRow(data = {}) {
+    const tbody = document.getElementById('invoiceItemsBody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td class="row-num" style="text-align:center;"></td>
+        <td><input type="text" class="i-desc ta-left" value="${data.desc || ''}" placeholder="..."></td>
+        <td><input type="text" class="i-in" value="${data.in || ''}" placeholder="DD/MM/YY"></td>
+        <td><input type="text" class="i-out" value="${data.out || ''}" placeholder="DD/MM/YY"></td>
+        <td><input type="number" class="i-nights" value="${data.nights || ''}" oninput="calcRow(this)"></td>
+        <td><input type="number" class="i-qty" value="${data.qty || ''}" oninput="calcRow(this)"></td>
+        <td><input type="number" class="i-total" value="${data.total || ''}" style="text-align:right;" oninput="calcTotal()"></td>
+        <td class="no-print"><button class="btn-red" onclick="this.closest('tr').remove(); updateRowNumbers(); calcTotal();">X</button></td>
+    `;
+    tbody.appendChild(tr);
+    updateRowNumbers();
+}
+
+function updateRowNumbers() {
+    document.querySelectorAll('.row-num').forEach((td, index) => {
+        td.textContent = index + 1;
+    });
+}
+
+function calcRow(element) {
+    calcTotal();
+}
+
 document.getElementById('docType').addEventListener('change', function() {
     updateDocTitle();
     generateInvoiceNumber();
@@ -85,22 +217,24 @@ document.getElementById('docType').addEventListener('change', function() {
 
 function updateDocTitle() {
     const type = document.getElementById('docType').value;
+    const lang = document.getElementById('langSelect').value;
     const title = document.getElementById('displayDocTitle');
-    if(type === 'CASH') title.textContent = "บิลเงินสด (CASH RECEIPT)";
-    else title.textContent = "ใบเสร็จรับเงิน / ใบกำกับภาษี (RECEIPT / TAX INVOICE)";
+    
+    if(type === 'CASH') {
+        title.textContent = lang === 'EN' ? "CASH RECEIPT" : "บิลเงินสด (CASH RECEIPT)";
+    } else {
+        title.textContent = lang === 'EN' ? "RECEIPT / TAX INVOICE" : "ใบเสร็จรับเงิน / ใบกำกับภาษี (RECEIPT / TAX INVOICE)";
+    }
 }
 
 async function generateInvoiceNumber() {
-    if(currentInvoiceId) return; // ถ้าเป็นบิลเก่า ไม่รันเลขใหม่
-    
+    if(currentInvoiceId) return; 
     const type = document.getElementById('docType').value;
     const prefix = type === 'TAX' ? 'INV' : 'CSH';
-    
-    // แปลง ค.ศ. เป็น พ.ศ. (ปี 2024 -> 2567 -> ใช้ 67)
     const d = new Date();
     const yearThai = (d.getFullYear() + 543).toString().slice(-2);
     const monthStr = (d.getMonth() + 1).toString().padStart(2, '0');
-    const yearMonth = `${yearThai}${monthStr}`; // ex. 6705
+    const yearMonth = `${yearThai}${monthStr}`;
 
     const { data } = await db.from('invoices')
         .select('invoice_number')
@@ -108,24 +242,19 @@ async function generateInvoiceNumber() {
         .order('invoice_number', { ascending: false }).limit(1);
 
     let nextNum = 1;
-    if (data && data.length > 0) {
-        nextNum = parseInt(data[0].invoice_number.slice(-4)) + 1;
-    }
+    if (data && data.length > 0) nextNum = parseInt(data[0].invoice_number.slice(-4)) + 1;
     document.getElementById('invNumber').value = `${prefix}${yearMonth}${nextNum.toString().padStart(4, '0')}`;
 }
 
 function calcTotal() {
-    const nights = parseFloat(document.getElementById('nights').value) || 0;
-    const price = parseFloat(document.getElementById('pricePerNight').value) || 0;
-    const others = parseFloat(document.getElementById('otherCharges').value) || 0;
-    
-    const grandTotal = (nights * price) + others;
-    document.getElementById('grandTotalText').value = grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+    let grandTotal = 0;
+    document.querySelectorAll('.i-total').forEach(input => {
+        grandTotal += parseFloat(input.value) || 0;
+    });
     
     let subtotal = grandTotal;
     let vat = 0;
 
-    // ถ้าเป็นใบกำกับภาษี ให้ถอด VAT 7% ออกจากยอดรวม (Vat In)
     if (document.getElementById('docType').value === 'TAX') {
         subtotal = grandTotal * 100 / 107;
         vat = grandTotal - subtotal;
@@ -138,15 +267,13 @@ function calcTotal() {
     document.getElementById('thaiBahtText').textContent = ArabicNumberToText(grandTotal.toFixed(2));
 }
 
-// 🟢 ฟังก์ชันบันทึกข้อมูลกลับลงฐานข้อมูล (รวม subtotal, vat_amount ด้วย)
 async function saveInvoice() {
     const btn = document.getElementById('btnSave');
     btn.textContent = "⏳ กำลังบันทึก...";
     btn.disabled = true;
     
-    // คำนวณใหม่ก่อนเซฟเพื่อความชัวร์
     calcTotal();
-    const grandTotal = parseFloat(document.getElementById('grandTotalText').value.replace(/,/g, '')) || 0;
+    const grandTotal = parseFloat(document.getElementById('valGrandTotal').textContent.replace(/,/g, '')) || 0;
     let subtotal = grandTotal;
     let vat = 0;
     if (document.getElementById('docType').value === 'TAX') {
@@ -154,44 +281,40 @@ async function saveInvoice() {
         vat = grandTotal - subtotal;
     }
 
-    // วันที่ที่เก็บเข้า DB จะต้องแปลงจาก string (dd/mm/yyyy) เป็น Date format
-    const strToDate = (str) => {
-        if(!str) return null;
-        const [d, m, y] = str.split('/');
-        return `${parseInt(y)-543}-${m}-${d}`;
-    };
+    const items = [];
+    document.querySelectorAll('#invoiceItemsBody tr').forEach(tr => {
+        const desc = tr.querySelector('.i-desc').value.trim();
+        if(desc) {
+            items.push({
+                desc: desc,
+                in: tr.querySelector('.i-in').value,
+                out: tr.querySelector('.i-out').value,
+                nights: parseFloat(tr.querySelector('.i-nights').value) || null,
+                qty: parseFloat(tr.querySelector('.i-qty').value) || null,
+                total: parseFloat(tr.querySelector('.i-total').value) || 0
+            });
+        }
+    });
 
     const payload = {
-        booking_room_id: bRoomId,
+        booking_id: bId,
         invoice_type: document.getElementById('docType').value,
         invoice_number: document.getElementById('invNumber').value,
         customer_name: document.getElementById('custName').value,
         customer_address: document.getElementById('custAddress').value,
         customer_tax_id: document.getElementById('custTaxId').value,
         customer_tel: document.getElementById('custTel').value,
-        room_number: document.getElementById('roomNo').value,
-        check_in_date: strToDate(document.getElementById('checkIn').value),
-        check_out_date: strToDate(document.getElementById('checkOut').value),
-        
-        // 🟢 แก้ไขตรงนี้: บังคับให้แปลงเป็นตัวเลข ถ้าเป็นช่องว่างให้ใส่ 0 แทน
-        nights: parseInt(document.getElementById('nights').value) || 0,
-        price_per_night: parseFloat(document.getElementById('pricePerNight').value) || 0,
-        other_charges: parseFloat(document.getElementById('otherCharges').value) || 0,
-        
         subtotal: subtotal,
         vat_amount: vat,
         grand_total: grandTotal,
-        note: document.getElementById('remark').value
+        note: document.getElementById('remark').value,
+        items: items
     };
 
     try {
         if (currentInvoiceId) {
-            // Update ของเดิม
             await db.from('invoices').update(payload).eq('invoice_id', currentInvoiceId);
         } else {
-            // Insert ใหม่ (จะไปดึง booking_id ฝั่งเซิฟเวอร์มาใส่ด้วย)
-            const { data: br } = await db.from('booking_rooms').select('booking_id').eq('booking_room_id', bRoomId).single();
-            payload.booking_id = br.booking_id;
             const { data, error } = await db.from('invoices').insert([payload]).select('invoice_id').single();
             if(error) throw error;
             currentInvoiceId = data.invoice_id;
@@ -205,22 +328,27 @@ async function saveInvoice() {
     }
 }
 
-// --- Utilities ---
 function formatDate(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543}`;
 }
+
 function fillDateInputs(d) {
-    const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-    document.getElementById('invDay').value = d.getDate();
-    document.getElementById('invMonth').value = months[d.getMonth()];
-    document.getElementById('invYear').value = d.getFullYear() + 543;
+    const lang = document.getElementById('langSelect').value;
+    const monthsTH = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    const monthsEN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     
-    const fd = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()+543}`;
+    document.getElementById('invDay').value = d.getDate();
+    document.getElementById('invMonth').value = lang === 'EN' ? monthsEN[d.getMonth()] : monthsTH[d.getMonth()];
+    document.getElementById('invYear').value = lang === 'EN' ? d.getFullYear() : d.getFullYear() + 543;
+    
+    const yearForSign = lang === 'EN' ? d.getFullYear() : d.getFullYear() + 543;
+    const fd = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${yearForSign}`;
     document.getElementById('staffSignDate').value = fd;
     document.getElementById('custSignDate').value = fd;
 }
+
 function ArabicNumberToText(Number) {
     var Number = Number.toString().replace(/,/g, "");
     if (isNaN(Number)) return "ข้อมูลไม่ถูกต้อง";

@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// ส่วนที่ 1: ตารางรายรับหลักฝั่งซ้าย
+// ส่วนที่ 1: ตารางรายรับหลักฝั่งซ้าย (ย้อนกลับเป็นแบบแยกห้องเหมือนเดิม)
 // ==========================================
 let bookingCache = {};
 let bookingRoomCache = {}; 
@@ -66,6 +66,7 @@ async function loadRevenueData(selectedDate) {
     try {
         const { data: allRooms } = await db.from('rooms').select('room_id').order('room_id', { ascending: true });
         
+        // 🟢 ดึงข้อมูล invoices เชื่อมจาก bookings เพื่อให้ดึงสถานะบิลได้
         const { data: bookingsToday } = await db.from('booking_rooms')
             .select(`
                 booking_room_id, room_id, check_in_date, check_out_date,
@@ -73,9 +74,9 @@ async function loadRevenueData(selectedDate) {
                     booking_id, total_price, deposit_amount, deposit_payment_time, deposit_staff, deposit_payment_method,
                     remaining_amount, final_payment_time, payment_received_by_staff, final_payment_method,
                     booking_channel, ota_reference_number, notes,
-                    customers(customer_id, name, phone)
-                ),
-                invoices ( invoice_id, invoice_type, invoice_number )
+                    customers(customer_id, name, phone),
+                    invoices ( invoice_id, invoice_type, invoice_number )
+                )
             `)
             .lte('check_in_date', selectedDate).gt('check_out_date', selectedDate);
 
@@ -130,12 +131,13 @@ async function loadRevenueData(selectedDate) {
             else if (b && b.bookings) {
                 const bk = b.bookings;
                 const bId = bk.booking_id;
-                bookingCache[bId] = b;
+                bookingCache[bId] = { bookings: bk };
                 bookingRoomCache[b.booking_room_id] = b; 
                 
                 let totalDisp = "-", depDisp = "-", depDateTxt = "-", depStaff = "-", depMethodDisp = "-";
                 let payDisp = "-", payDateTxt = "-", payStaff = "-", payMethodDisp = "-", balDisp = "-", noteDisp = "-";
                 let depDateStyle = "", payDateStyle = ""; 
+                let invStatus = "-"; // เก็บสถานะบิล
 
                 const relatedRooms = (bookingsToday || []).filter(item => item.bookings?.booking_id === bId);
                 const roomCount = relatedRooms.length;
@@ -147,8 +149,10 @@ async function loadRevenueData(selectedDate) {
                 if (isMultiRoom) {
                     const rowColor = getBookingColor(bId); 
                     trStyle = `style="cursor: pointer; background-color: ${rowColor} !important;"`;
+                    // ไม่โชว์ป้ายหลายห้องที่ชื่อ ID ตามที่คุณแจ้งมา
                 }
 
+                // 🟢 แสดงผลข้อมูลการเงินและบิลเฉพาะห้องแรกสุดของการจอง
                 if (!priceShown.has(bId)) {
                     const total = parseFloat(bk.total_price) || 0;
                     const deposit = parseFloat(bk.deposit_amount) || 0;
@@ -199,27 +203,27 @@ async function loadRevenueData(selectedDate) {
                     depStaff = safeStaffMap[bk.deposit_staff] || '-';
                     payStaff = safeStaffMap[bk.payment_received_by_staff] || '-';
                     noteDisp = bk.notes || '-';
+                    
+                    // เช็คสถานะการออกใบกำกับภาษี (โชว์เฉพาะแถวแรก)
+                    if (bk.invoices && bk.invoices.length > 0) {
+                        const type = bk.invoices[0].invoice_type;
+                        invStatus = type === 'TAX' 
+                            ? '<span style="background:#e3f2fd; color:#1565c0; padding:2px 4px; border-radius:3px; font-size:10px; font-weight:bold;">TAX</span>' 
+                            : '<span style="background:#e8f5e9; color:#2e7d32; padding:2px 4px; border-radius:3px; font-size:10px; font-weight:bold;">CASH</span>';
+                    }
+
                     priceShown.add(bId);
                 } else {
+                    // 🟢 ถ้าเป็นห้องที่ 2, 3... ในบิลเดียวกัน ให้ซ่อนข้อมูลและบิล เพื่อความสะอาดตา
                     totalDisp = `<span style="color:#ccc; font-size:10px;">(รวมใน #${bId})</span>`;
-                }
-
-                let invStatus = '-';
-                if (b.invoices && b.invoices.length > 0) {
-                    const type = b.invoices[0].invoice_type;
-                    invStatus = type === 'TAX' 
-                        ? '<span style="background:#e3f2fd; color:#1565c0; padding:2px 4px; border-radius:3px; font-size:10px; font-weight:bold;">TAX</span>' 
-                        : '<span style="background:#e8f5e9; color:#2e7d32; padding:2px 4px; border-radius:3px; font-size:10px; font-weight:bold;">CASH</span>';
+                    invStatus = "-";
                 }
 
                 tbody.innerHTML += `
-                    <tr onclick="openViewBookingModal('${bId}', '${b.booking_room_id}')" ${trStyle}>
+                    <tr onclick="openViewBookingModal('${bId}')" ${trStyle}>
                         <td><b>${room.room_id}</b></td>
                         <td style="color:#2e7d32; font-weight:bold; font-size:11px;">${bk.customers?.name || '-'}</td>
-                        <td class="col-booking">
-                            #${bId} 
-                            ${multiRoomBadge} 
-                        </td>
+                        <td class="col-booking">#${bId}</td>
                         <td class="col-channel">${bk.booking_channel || '-'}</td>
                         <td class="col-ref">${bk.ota_reference_number || '-'}</td>
                         <td>${totalDisp}</td>
@@ -474,19 +478,15 @@ async function saveOtherTransaction() {
 let currentViewBookingId = null; 
 let currentCustomerId = null;
 
-function openViewBookingModal(bookingId, bookingRoomId) {
+function openViewBookingModal(bookingId) {
     try {
         let data, b, roomsStr, checkInStr, checkOutStr;
 
-        if (bookingRoomId && bookingRoomCache[bookingRoomId]) {
-            data = bookingRoomCache[bookingRoomId];
-            b = data.bookings;
-            roomsStr = data.room_id; 
-            checkInStr = data.check_in_date;
-            checkOutStr = data.check_out_date;
-        } else if (bookingCache[bookingId]) {
+        if (bookingCache[bookingId]) {
             data = bookingCache[bookingId];
             b = data.bookings;
+            
+            // 🟢 ดึงรหัสห้องทั้งหมดที่เป็นของ Booking นี้มาโชว์ในบิล
             roomsStr = (b.booking_rooms || []).map(r => r.room_id).join(', ');
             checkInStr = (b.booking_rooms && b.booking_rooms.length > 0) ? b.booking_rooms[0].check_in_date : '-';
             checkOutStr = (b.booking_rooms && b.booking_rooms.length > 0) ? b.booking_rooms[0].check_out_date : '-';
@@ -531,14 +531,10 @@ function openViewBookingModal(bookingId, bookingRoomId) {
         const isFullyPaid = (net === 0);
         const actionArea = document.getElementById('invoiceActionArea');
         if (actionArea) {
-            if (bookingRoomId) {
-                if (isFullyPaid) {
-                    actionArea.innerHTML = `<button onclick="window.open('invoice.html?br_id=${bookingRoomId}', '_blank')" class="btn-invoice">🧾 ออกบิลเงินสด / ใบกำกับภาษี (ห้อง ${roomsStr})</button>`;
-                } else {
-                    actionArea.innerHTML = `<div style="color: red; text-align: center; font-weight: bold;">⚠️ ค้างชำระสุทธิ (ต้องชำระครบก่อนออกเอกสารบิล/ภาษีได้)</div>`;
-                }
+            if (isFullyPaid) {
+                actionArea.innerHTML = `<button onclick="window.open('invoice.html?b_id=${currentViewBookingId}', '_blank')" class="btn-invoice">🧾 ออกบิลเงินสด / ใบกำกับภาษี (รวมทั้ง Booking)</button>`;
             } else {
-                actionArea.innerHTML = `<div style="color: gray; text-align: center; font-size: 12px;">(ออกใบกำกับภาษีได้จากตารางห้องพักฝั่งซ้ายเท่านั้น)</div>`;
+                actionArea.innerHTML = `<div style="color: red; text-align: center; font-weight: bold;">⚠️ ค้างชำระสุทธิ (ต้องชำระครบก่อนออกเอกสารบิล/ภาษีได้)</div>`;
             }
         }
 
@@ -551,7 +547,6 @@ function openViewBookingModal(bookingId, bookingRoomId) {
     }
 }
 
-// 🟢 ฟังก์ชันส่งไปหน้าออกใบ Folio 
 function goToFolio() {
     if (currentViewBookingId) {
         window.open(`folio.html?booking_id=${currentViewBookingId}`, '_blank');
