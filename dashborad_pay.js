@@ -246,7 +246,7 @@ async function loadRevenueData(selectedDate) {
                     <tr onclick="openQuickBookModal('${room.room_id}')" style="cursor: pointer; background: #fafafa;">
                         <td><b>${room.room_id}</b></td>
                         <td colspan="16" style="color: #9e9e9e; text-align: center;">
-                            -- ว่าง -- <span style="color: #2196F3; font-size: 11px;">(คลิกเพื่อจองด่วน)</span>
+                            -- ว่าง -- 
                         </td>
                     </tr>
                 `;

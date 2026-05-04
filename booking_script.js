@@ -1024,7 +1024,7 @@ document.getElementById('bookingForm').addEventListener('submit', async function
                 await db.from('booking_rooms').insert([roomPayload]);
             }
         }
-
+        backupBookingToSheet(currentBookingId);
         alert(`✅ บันทึกการจองสำเร็จ! (บิล #${currentBookingId})`);
         window.location.href = returnUrl; // บันทึกเสร็จให้เด้งกลับหน้า Dashboard เลย
 
@@ -1163,3 +1163,147 @@ document.getElementById('depositDate').addEventListener('change', function() {
 document.getElementById('paymentDate').addEventListener('change', function() {
     validatePaymentTime(this);
 });
+
+// ==========================================
+// 🟢 ฟังก์ชันสำรองข้อมูลลง Google Sheet (อัปเกรด: ส่งไวทะลุเพดาน ไม่ต้องรอ!)
+// ==========================================
+function backupBookingToSheet(bookingId) {
+
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZgZHgR_3Rb7NDtGXRWtgTrmBEEobZUiY9JKtcscjNzypYYiZp7BswlcNKmbOTdvbF/exec';
+    
+    if (!bookingId) return;
+
+    try {
+        // --- ฟังก์ชันดึงชื่อพนักงานจาก Dropdown หน้าเว็บตรงๆ (ไม่ต้องโหลด DB) ---
+        const getSelectText = (id) => {
+            const el = document.getElementById(id);
+            return (el && el.selectedIndex > 0) ? el.options[el.selectedIndex].text : '-';
+        };
+
+        // --- ฟังก์ชันจัดรูปแบบเวลา ---
+        const formatTime = (dateString) => {
+            if (!dateString) return '-';
+            const d = new Date(dateString);
+            return d.toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+        };
+
+        const formatDateOnly = (dateStr) => {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        };
+
+        // --- รวมรายการห้องจากตัวแปร selectedRoomsList ในหน้าเว็บตรงๆ ---
+        const roomList = selectedRoomsList.map(r => {
+            return `${r.roomId} (${formatDateOnly(r.checkIn)} ถึง ${formatDateOnly(r.checkOut)})`;
+        }).join(', \n');
+
+        // --- รวบรวมข้อมูลจากช่องกรอกในหน้าเว็บ ---
+        const payload = {
+            booking_id: bookingId,
+            customer_name: document.getElementById('customerName').value || '-',
+            customer_phone: document.getElementById('customerPhone').value || '-',
+            rooms: roomList || '-',
+            booking_channel: document.getElementById('bookingChannel').value || '-',
+            ota_reference: document.getElementById('otaRef').value || '-',
+            total_price: parseFloat(document.getElementById('totalPrice').value) || 0,
+            deposit_amount: parseFloat(document.getElementById('depositAmount').value) || 0,
+            deposit_date: formatTime(document.getElementById('depositDate').value),
+            deposit_staff_name: getSelectText('depositStaff'),
+            remaining_amount: parseFloat(document.getElementById('paymentAmount').value) || 0,
+            pay_date: formatTime(document.getElementById('paymentDate').value),
+            pay_staff_name: getSelectText('paymentStaff'),
+            note: document.getElementById('bookingNote').value || '-'
+        };
+
+        // --- ยิงข้อมูลไปแบบ Fire & Forget + keepalive ---
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            keepalive: true, // 🟢 คำสั่งเวทมนตร์: สั่งบราวเซอร์ให้ส่งต่อให้จบ แม้หน้าเว็บจะถูกปิดหรือเด้งไปหน้าอื่นแล้ว!
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(err => console.log("Backup Error (Background):", err));
+        
+    } catch (err) {
+        console.error("❌ Form Data Extraction failed:", err);
+    }
+}
+//back up ๗ากฐานข้อมูล  
+//async function backupBookingToSheet(bookingId) {
+//     // ⚠️ นำ Web App URL ของคุณมาใส่ตรงนี้
+//     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZgZHgR_3Rb7NDtGXRWtgTrmBEEobZUiY9JKtcscjNzypYYiZp7BswlcNKmbOTdvbF/exec';
+    
+//     if (!bookingId) return;
+
+//     try {
+//         // 1. ดึงชื่อพนักงานทั้งหมดมาเตรียมไว้แปลงจาก ID -> ชื่อ
+//         const { data: staffs } = await db.from('staffs').select('staff_id, staff_name');
+//         const staffMap = {};
+//         if (staffs) staffs.forEach(s => staffMap[s.staff_id] = s.staff_name);
+
+//         // 2. ดึงข้อมูล Booking พร้อม Customer และ Booking_rooms (เพิ่ม check_in_date, check_out_date)
+//         const { data: bData, error } = await db.from('bookings')
+//             .select(`
+//                 booking_id, booking_channel, ota_reference_number, total_price,
+//                 deposit_amount, deposit_payment_time, deposit_staff,
+//                 remaining_amount, final_payment_time, payment_received_by_staff, notes,
+//                 customers ( name, phone ),
+//                 booking_rooms ( room_id, check_in_date, check_out_date )
+//             `)
+//             .eq('booking_id', bookingId)
+//             .single();
+
+//         if (error || !bData) throw new Error("ไม่พบข้อมูล Booking ที่จะนำไป Backup");
+
+//         // --- ฟังก์ชันแปลงวันที่แบบย่อ สำหรับเช็คอิน/เช็คเอาท์ ---
+//         const formatDateOnly = (dateStr) => {
+//             if (!dateStr) return '-';
+//             const d = new Date(dateStr);
+//             // แสดงผลเป็น วว/ดด/ปปปป (เช่น 15/04/2024)
+//             return d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+//         };
+
+//         // 3. รวมหมายเลขห้องและวันที่เข้าด้วยกัน (เช่น "101 (15/04/2024 - 16/04/2024)")
+//         const roomList = (bData.booking_rooms || []).map(r => {
+//             return `${r.room_id} (${formatDateOnly(r.check_in_date)} ถึง ${formatDateOnly(r.check_out_date)})`;
+//         }).join(', \n'); // เคาะบรรทัดให้แต่ละห้องอ่านง่ายขึ้นใน Sheet
+
+//         // 4. แปลงวันที่และเวลาสำหรับบันทึกการจ่ายเงิน
+//         const formatTime = (isoString) => {
+//             if (!isoString) return '-';
+//             const d = new Date(isoString);
+//             return d.toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+//         };
+
+//         // 5. จัดเรียงข้อมูลเพื่อส่งไป Google Sheet
+//         const payload = {
+//             booking_id: bData.booking_id,
+//             customer_name: bData.customers?.name || '-',
+//             customer_phone: bData.customers?.phone || '-',
+//             rooms: roomList || '-',
+//             booking_channel: bData.booking_channel || '-',
+//             ota_reference: bData.ota_reference_number || '-',
+//             total_price: bData.total_price || 0,
+//             deposit_amount: bData.deposit_amount || 0,
+//             deposit_date: formatTime(bData.deposit_payment_time),
+//             deposit_staff_name: staffMap[bData.deposit_staff] || '-',
+//             remaining_amount: bData.remaining_amount || 0,
+//             pay_date: formatTime(bData.final_payment_time),
+//             pay_staff_name: staffMap[bData.payment_received_by_staff] || '-',
+//             note: bData.notes || '-'
+//         };
+
+//         // 6. ยิงข้อมูลไป Google Apps Script
+//         await fetch(GOOGLE_SCRIPT_URL, {
+//             method: 'POST',
+//             mode: 'no-cors',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(payload)
+//         });
+        
+//         console.log("✅ Backup to Google Sheets สำเร็จ!");
+//     } catch (err) {
+//         console.error("❌ Backup failed:", err);
+//     }
+// }
