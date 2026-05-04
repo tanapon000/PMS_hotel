@@ -24,7 +24,18 @@ function changeDate(daysToAdd, inputId) {
     const event = new Event('change');
     dateInput.dispatchEvent(event);
 }
-
+function updateDateDisplay(dateStr) {
+    if (!dateStr) return;
+    const d = new Date(dateStr);
+    const monthsTH = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    const day = d.getDate();
+    const month = monthsTH[d.getMonth()];
+    const year = d.getFullYear() + 543;
+    const displayEl = document.getElementById('displaySelectedDate');
+    if (displayEl) {
+        displayEl.textContent = `วันที่ ${day} ${month} ${year}`;
+    }
+}
 
 // --- 2. ทำงานเมื่อเปิดหน้าเว็บ ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -50,12 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. โหลดข้อมูลของวันนั้น
         loadDashboardData(savedDate);
-
+        updateDateDisplay(savedDate);
         // 4. ดักจับเมื่อผู้ใช้ "เปลี่ยนวันที่" ให้ทำการบันทึกลงความจำทันที
         dateInput.addEventListener('change', (e) => {
             const newDate = e.target.value;
             localStorage.setItem('pms_selected_date', newDate); // จำค่าใหม่
             loadDashboardData(newDate); // โหลดข้อมูลใหม่
+            updateDateDisplay(newDate); // อัปเดตการแสดงวันที่ใหม่
         });
     }
 });
@@ -65,20 +77,25 @@ document.addEventListener('DOMContentLoaded', () => {
 // ฟังก์ชันดึงข้อมูลและสร้างตาราง Dashboard หลัก
 // ==========================================
 
+// ==========================================
+// ฟังก์ชันดึงข้อมูลและสร้างตาราง Dashboard หลัก
+// ==========================================
+
 async function loadDashboardData(selectedDate) {
     const tbody = document.getElementById('dashboardTableBody');
-    // 🟢 ปรับ colspan เป็น 16 ให้เท่ากับจำนวนช่อง <th> ทั้งหมด
-    tbody.innerHTML = '<tr><td colspan="16">⏳ กำลังดึงข้อมูล...</td></tr>';
+    // 🟢 เปลี่ยน colspan เป็น 18 ให้เท่ากับจำนวนช่อง <th> ทั้งหมดรวมห้อง
+    tbody.innerHTML = '<tr><td colspan="18">⏳ กำลังดึงข้อมูล...</td></tr>';
 
     try {
         // 1. ดึงห้องทั้งหมด
         const { data: allRooms, error: roomsErr } = await db.from('rooms').select('room_id').order('room_id', { ascending: true });
         if (roomsErr) throw roomsErr;
 
-        // 2. ดึงข้อมูลการจอง
+        // 2. ดึงข้อมูลการจอง (🟢 เพิ่ม adult_count, child_count, extra_bed เข้ามา)
         const { data: bookingsToday, error: bookErr } = await db.from('booking_rooms')
             .select(`
                 booking_room_id, room_id, check_in_date, check_out_date, note,
+                adult_count, child_count, extra_bed,
                 bookings ( 
                     booking_id, customer_id, total_price, deposit_amount, remaining_amount, booking_channel, ota_reference_number, notes,
                     customers ( customer_id, name, phone, id_card_or_passport )
@@ -89,11 +106,11 @@ async function loadDashboardData(selectedDate) {
             
         if (bookErr) throw bookErr;
 
-        // 🟢 3. (ส่วนที่เพิ่มใหม่) ดึงข้อมูลห้องเสีย/ปิดซ่อม
+        // 3. ดึงข้อมูลห้องเสีย/ปิดซ่อม
         const { data: maintenanceToday, error: mtErr } = await db.from('maintenance_rooms')
             .select('*')
-            .lte('start_date', selectedDate)  // วันเริ่มซ่อมต้องน้อยกว่าหรือเท่ากับวันที่เลือก
-            .gte('end_date', selectedDate);   // วันซ่อมเสร็จต้องมากกว่าหรือเท่ากับวันที่เลือก
+            .lte('start_date', selectedDate)  
+            .gte('end_date', selectedDate);   
 
         if (mtErr) throw mtErr;
 
@@ -113,22 +130,19 @@ async function loadDashboardData(selectedDate) {
         let waitRoomsList = [];
 
         (allRooms || []).forEach(room => {
-            const mt = maintenanceMap[room.room_id]; // เช็คข้อมูลห้องซ่อม
-            const b = bookingMap[room.room_id];      // เช็คข้อมูลการจอง
+            const mt = maintenanceMap[room.room_id]; 
+            const b = bookingMap[room.room_id];      
 
             // ==============================================
             // 🚨 ลำดับที่ 1: เช็คว่าห้องปิดซ่อมอยู่หรือไม่?
             // ==============================================
             if (mt) {
-                // ถ้าซ่อมอยู่ ให้แสดงแถวสีแดง
+                // 🟢 เปลี่ยน colspan เป็น 17
                 tbody.innerHTML += `
                     <tr style="background-color: #ffebee; cursor: not-allowed;" title="ห้องนี้กำลังปิดซ่อมบำรุง">
                         <td><b style="color: #c62828;">${room.room_id}</b></td>
-                        <td colspan="14" style="color: #c62828; font-weight: bold; text-align: left; padding-left: 20px;">
+                        <td colspan="17" style="color: #c62828; font-weight: bold; text-align: left; padding-left: 20px;">
                             🛠️ ปิดซ่อมบำรุง: ${mt.reason || '-'}
-                        </td>
-                        <td class="col-manage">
-                            <button class="btn-manage" style="background: #e0e0e0; color: #888; pointer-events: none; border: 1px solid #ccc;">-</button>
                         </td>
                     </tr>
                 `;
@@ -145,7 +159,6 @@ async function loadDashboardData(selectedDate) {
 
                 const bId = b.bookings.booking_id;
 
-                // 1. 🎨 ตรรกะไฮไลท์สี
                 if (!bookingColors[bId]) {
                     bookingColors[bId] = getBookingColor(bId);
                 }
@@ -155,7 +168,6 @@ async function loadDashboardData(selectedDate) {
                     rowStyle = `style="background-color: ${bookingColors[bId]};"`;
                 }
 
-                // 2. 💰 ตรรกะการแสดงราคา และ Note (รวม)
                 if (!priceShown.has(bId)) {
                     const total = parseFloat(b.bookings.total_price) || 0;
                     const deposit = parseFloat(b.bookings.deposit_amount) || 0;
@@ -178,7 +190,6 @@ async function loadDashboardData(selectedDate) {
                     bookingNoteDisplay = ""; 
                 }
 
-                // 3. ตรรกะ Check-in/out และ ข้อมูลแขก
                 const selDateObj = new Date(selectedDate);
                 selDateObj.setDate(selDateObj.getDate() + 1);
                 const tomorrowStr = selDateObj.toISOString().split('T')[0];
@@ -209,6 +220,11 @@ async function loadDashboardData(selectedDate) {
                 const customer = b.bookings.customers || {};
                 const otaRef = b.bookings.ota_reference_number || '-';
                 const panelData = encodeURIComponent(JSON.stringify(b));
+                
+                // 🟢 ดึงข้อมูลผู้เข้าพักและเตียงเสริม
+                const adultDisp = b.adult_count || 0;
+                const childDisp = b.child_count || 0;
+                const extraBedDisp = b.extra_bed ? '✅' : '-';
 
                 tbody.innerHTML += `
                     <tr ${rowStyle} onclick="openViewBookingModal('${panelData}')" style="cursor: pointer;">
@@ -223,11 +239,16 @@ async function loadDashboardData(selectedDate) {
                         <td>${priceDisplay}</td>
                         <td style="color: green;">${depositDisplay}</td>
                         <td>${balanceDisplay}</td>
+                        
                         <td onclick="event.stopPropagation(); openSidePanel('${panelData}', '${room.room_id}')">${checkInTime}</td>
                         <td onclick="event.stopPropagation(); openSidePanel('${panelData}', '${room.room_id}')">${checkOutTime}</td>
                         <td onclick="event.stopPropagation(); openSidePanel('${panelData}', '${room.room_id}')" class="col-breakfast">${breakfastDisplay}</td>
                         <td onclick="event.stopPropagation(); openSidePanel('${panelData}', '${room.room_id}')" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis;" title="${b.note || ''}">${b.note || '-'}</td>
-                        <td><button class="btn-manage" onclick="event.stopPropagation(); openSidePanel('${panelData}', '${room.room_id}')">📝 จัดการ</button></td>
+                        
+                        <!-- 🟢 3 ช่องใหม่แทนที่ปุ่มจัดการ (แอบใส่ onclick ให้คลิกช่องนี้แล้วเปิด Side Panel ได้เลย) -->
+                        <td onclick="event.stopPropagation(); openSidePanel('${panelData}', '${room.room_id}')" class="col-pax" style="color:#1565c0; font-weight:bold;">${adultDisp}</td>
+                        <td onclick="event.stopPropagation(); openSidePanel('${panelData}', '${room.room_id}')" class="col-pax" style="color:#00b33f; font-weight:bold;">${childDisp}</td>
+                        <td onclick="event.stopPropagation(); openSidePanel('${panelData}', '${room.room_id}')" class="col-pax">${extraBedDisp}</td>
                     </tr>
                 `;
             } 
@@ -235,19 +256,16 @@ async function loadDashboardData(selectedDate) {
             // ⚪ ลำดับที่ 3: ถ้าไม่มีการจอง และ ไม่เสีย = ห้องว่าง
             // ==============================================
             else {
+                // 🟢 เปลี่ยน colspan เป็น 17
                 tbody.innerHTML += `
                     <tr onclick="openQuickBookModal('${room.room_id}')" style="cursor: pointer;">
                         <td><b>${room.room_id}</b></td>
-                        <td colspan="14" style="color: #999;">-- ว่าง --</td>
-                        <td class="col-manage">
-                            <button class="btn-manage" style="background: #e0e0e0; color: #888; pointer-events: none; border: 1px solid #ccc;">-</button>
-                        </td>
+                        <td colspan="17" style="color: #999;">-- ว่าง --</td>
                     </tr>
                 `;
             }
         });
 
-        // อัปเดตกล่องสรุปด้านขวาบน
         if (document.getElementById('sumCheckedIn')) {
             document.getElementById('sumCheckedIn').textContent = checkedInCount;
             document.getElementById('sumNotCheckedIn').textContent = notCheckedInCount;
@@ -256,7 +274,7 @@ async function loadDashboardData(selectedDate) {
 
     } catch (error) {
         console.error("Dashboard Load Error:", error);
-        tbody.innerHTML = `<tr><td colspan="16" style="color:red; font-weight:bold;">❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="18" style="color:red; font-weight:bold;">❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}</td></tr>`;
     }
 }
 

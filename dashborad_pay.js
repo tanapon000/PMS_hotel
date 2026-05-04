@@ -14,6 +14,18 @@ function changeDate(daysToAdd, inputId) {
     const event = new Event('change');
     dateInput.dispatchEvent(event);
 }
+function updateDateDisplay(dateStr) {
+    if (!dateStr) return;
+    const d = new Date(dateStr);
+    const monthsTH = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    const day = d.getDate();
+    const month = monthsTH[d.getMonth()];
+    const year = d.getFullYear() + 543;
+    const displayEl = document.getElementById('displaySelectedDate');
+    if (displayEl) {
+        displayEl.textContent = `วันที่ ${day} ${month} ${year}`;
+    }
+}
 
 let staffMapData = {};
 document.addEventListener('DOMContentLoaded', async () => {
@@ -41,11 +53,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             savedDate = dateObj.toISOString().split('T')[0];
             localStorage.setItem('pms_selected_date', savedDate);
         }
+        updateDateDisplay(savedDate);
         datePicker.value = savedDate;
         loadAllData(savedDate);
         datePicker.addEventListener('change', (e) => {
             const newDate = e.target.value;
             localStorage.setItem('pms_selected_date', newDate); 
+            updateDateDisplay(newDate);
             loadAllData(newDate); 
         });
     }
@@ -272,6 +286,7 @@ function loadAllData(date) {
     dailySummary = { 'เงินสด': 0, 'เงินโอน': 0, 'บัตรเครดิต': 0, 'Qr code': 0 };
     loadShiftRoomIncome(startStr, endStr);
     loadOtherTransactions(startStr, endStr);
+    
 }
 
 function addSummaryAmount(method, amount, type = 'Income') {

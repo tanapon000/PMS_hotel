@@ -96,7 +96,7 @@
         /* ทำให้ช่อง "จัดการ" หดเหลือขนาดพอดีเป๊ะกับปุ่ม */
         th.col-manage, td.col-manage { width: 1%; white-space: nowrap; padding: 2px 4px; }
         th.col-breakfast, td.col-breakfast { width: 65px; max-width: 65px; font-size: 11px; }
-        
+        th.col-pax, td.col-pax { width: 25px; max-width: 25px; font-size: 11px; padding: 2px; }
         .btn-manage { background: #ff9800; color: white; border: none; padding: 4px 5px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px;font-size: 10px;line-height: 1;}
         .btn-manage:hover { background: #e68a00; }
         .btn-save { background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
@@ -162,6 +162,7 @@
             <button class="date-nav-btn" onclick="changeDate(-1, 'dashboardDate')">◀</button>
             <input type="date" id="dashboardDate" class="date-picker">
             <button class="date-nav-btn" onclick="changeDate(1, 'dashboardDate')">▶</button>
+            <span id="displaySelectedDate" style="font-size: 24px; font-weight: bold; color: #1565c0; margin-left: 15px;">วันที่...</span>
         </div>
     </div>
     
@@ -191,9 +192,11 @@
                 <th>ค้างชำระ</th>
                 <th class="col-time">Check-in</th>
                 <th class="col-time">Check-out</th>
-                <th class="col-breakfast" >Breakfast</th>
+                <th class="col-breakfast">Breakfast</th>
                 <th>Note (ห้อง)</th>
-                <th class="col-manage">จัดการ</th>
+                <th class="col-pax" title="จำนวนผู้ใหญ่ (Adult)">🧑</th>
+                <th class="col-pax" title="จำนวนเด็ก (Child)">👦</th>
+                <th class="col-pax" title="เตียงเสริม (Extra Bed)">🛏️</th>
             </tr>
         </thead>
 <tbody id="dashboardTableBody">

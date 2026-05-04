@@ -295,7 +295,7 @@ async function openRoomModal() {
     try {
         // 1. ดึงข้อมูลห้องพักทั้งหมด
         const { data: allRooms } = await db.from('rooms')
-            .select('room_id, room_types(type_name)')
+            .select('room_id, type_id, room_types(type_name)')
             .order('room_id', { ascending: true });
 
         // 2. ดึงข้อมูลห้องที่ "ไม่ว่าง" (มีการจองที่คาบเกี่ยวกัน)
@@ -448,7 +448,7 @@ async function addRoomToTableFromGrid(roomId, roomType, roomTypeId, checkIn, che
         nights: nights,
         pricePerNight: pricePerNight,
         totalRoomPrice: pricePerNight * nights, 
-        adult: 1,
+        adult: 2,
         child: 0,
         extraBed: false
     });
@@ -502,15 +502,40 @@ function updateRoomTotal(index, newTotal) {
     calculateTotalPrice();
     // ไม่ต้องสั่ง renderTable() ใหม่ตรงนี้ เพื่อไม่ให้เสีย Focus ตอนพนักงานกำลังพิมพ์ตัวเลข
 }
+
 // ปรับปรุงฟังก์ชันคำนวณราคารวมสุทธิ
 function calculateTotalPrice() {
     let sum = selectedRoomsList.reduce((acc, curr) => acc + curr.totalRoomPrice, 0);
     document.getElementById('totalPrice').value = sum;
     calculateRemaining();
 }
+
+const EXTRA_BED_PRICE_PER_NIGHT = 200; // เปลี่ยนตัวเลข 200 เป็นราคาอื่นได้ตามต้องการ
+
 function updateRoom(index, field, value) {
-        selectedRoomsList[index][field] = (field === 'extraBed') ? value : parseFloat(value) || 0;
-        if(field === 'price') calculateTotalPrice();
+    const room = selectedRoomsList[index];
+
+    if (field === 'extraBed') {
+        const wasChecked = room.extraBed;
+        room.extraBed = value; // อัปเดตสถานะเป็น true หรือ false
+
+        // ถ้าติ๊กเลือกเตียงเสริม (บวกราคาเพิ่ม: ราคาเตียงเสริม x จำนวนคืน)
+        if (value === true && !wasChecked) {
+            room.totalRoomPrice += (EXTRA_BED_PRICE_PER_NIGHT * room.nights);
+        } 
+        // ถ้าเอาติ๊กออก (ลบราคาที่บวกไปกลับคืน)
+        else if (value === false && wasChecked) {
+            room.totalRoomPrice -= (EXTRA_BED_PRICE_PER_NIGHT * room.nights);
+        }
+        
+        // สั่งอัปเดตตารางให้ช่อง "ราคารวม" แสดงตัวเลขใหม่ทันที
+        renderTable(); 
+    } else {
+        room[field] = parseFloat(value) || 0;
+    }
+
+    // คำนวณราคาสุทธิใหม่ทุกครั้ง
+    calculateTotalPrice();
 }
 
 function removeRoom(index) {
