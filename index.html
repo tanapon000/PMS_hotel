@@ -2,15 +2,414 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>เข้าสู่ระบบ - Hotel PMS</title>
-    <meta http-equiv="refresh" content="0; url=login.html" />
-    
-    <script>
-        window.location.href = "login.html";
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โรงแรมสมายเพลส (Smile Place Hotel)</title>
+    <!-- โหลด Font จาก Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           ตั้งค่าพื้นฐาน
+           ========================================= */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            scroll-behavior: smooth;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        /* =========================================
+           แถบ Navigation Bar ด้านบน
+           ========================================= */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 15px 50px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-container h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #654000; /* สีน้ำตาลสไตล์โลโก้ */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px; /* ปรับลด gap ลงนิดหน่อยเพื่อเพิ่มปุ่ม */
+            align-items: center;
+        }
+
+        .lang-btn {
+            background: none;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: #e0e0e0;
+        }
+
+        /* ปุ่มเข้าสู่ระบบ PMS */
+        .login-btn {
+            background-color: #1565c0; /* สีน้ำเงินเข้ม */
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .login-btn:hover {
+            background-color: #0d47a1;
+        }
+
+        /* =========================================
+           ส่วนหัว (Hero Section)
+           ========================================= */
+        .hero {
+            position: relative;
+            height: 70vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('pic/6.jpg'); 
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            max-width: 800px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* =========================================
+           ส่วนแสดงรูปภาพ (Gallery Section)
+           ========================================= */
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            color: #814402;
+            margin: 50px 0 30px 0;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: #2e7d32;
+            margin: 10px auto 0 auto;
+            border-radius: 2px;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 0 50px;
+            max-width: 1200px;
+            margin: 0 auto 50px auto;
+        }
+
+        .gallery-item {
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            background: white;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-caption {
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        /* =========================================
+           ส่วนติดต่อเรา (Footer)
+           ========================================= */
+        .footer {
+            background-color: #263238;
+            color: white;
+            padding: 40px 50px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .footer-col {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-col h3 {
+            color: #81c784;
+            margin-top: 0;
+        }
+
+        .footer-col p {
+            line-height: 1.6;
+            margin: 5px 0;
+            color: #b0bec5;
+        }
+
+        .footer-bottom {
+            background-color: #1c262a;
+            color: #78909c;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar { padding: 15px 20px; flex-direction: column; gap: 10px; }
+            .nav-links { flex-wrap: wrap; justify-content: center; }
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1.2rem; }
+            .gallery { padding: 0 20px; }
+            .footer { padding: 30px 20px; }
+        }
+    </style>
 </head>
-<body style="font-family: sans-serif; text-align: center; padding-top: 50px; background: #e3f2fd; color: #1565c0;">
-    <h2>กำลังพาท่านเข้าสู่ระบบ PMS...</h2>
-    <p>หากระบบไม่พาไปอัตโนมัติ กรุณา <a href="login.html">คลิกที่นี่</a></p>
+<body>
+
+    <!-- แถบนำทาง (Navbar) -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <img src="pic/logo.png" alt="Smile Place Logo" style="height: 50px;">
+            <h1 class="lang-th">โรงแรมสมายเพลส</h1>
+            <h1 class="lang-en" style="display: none;">Smile Place Hotel</h1>
+            <h1 class="lang-cn" style="display: none;">微笑广场酒店</h1>
+        </div>
+        <div class="nav-links">
+            <!-- เพิ่มปุ่ม 3 ภาษา -->
+            <button class="lang-btn" onclick="toggleLang('en')" id="btn-en">🇬🇧 English</button>
+            <button class="lang-btn" onclick="toggleLang('cn')" id="btn-cn">🇨🇳 中文</button>
+            <button class="lang-btn" onclick="toggleLang('th')" id="btn-th" style="display: none;">🇹🇭 ภาษาไทย</button>
+            
+            <!-- ปุ่มสำหรับเข้าสู่ระบบ PMS -->
+            <a href="login.html" class="login-btn">
+                <span class="lang-th">🔒 เข้าสู่ระบบพนักงาน</span>
+                <span class="lang-en" style="display: none;">🔒 Staff Login</span>
+                <span class="lang-cn" style="display: none;">🔒 员工登录</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ส่วนหัว (Hero) -->
+    <header class="hero">
+        <h1 class="lang-th">ยินดีต้อนรับสู่ โรงแรมสมายเพลส</h1>
+        <h1 class="lang-en" style="display: none;">Welcome to Smile Place Hotel</h1>
+        <h1 class="lang-cn" style="display: none;">欢迎来到微笑广场酒店</h1>
+        
+        <p class="lang-th">พักผ่อนอย่างสบายใจ ในราคาที่คุ้มค่า พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
+        <p class="lang-en" style="display: none;">Relax comfortably at a great value, complete with full amenities.</p>
+        <p class="lang-cn" style="display: none;">以超值的价格享受舒适的住宿和完善的设施。</p>
+    </header>
+
+    <!-- แกลลอรี่รูปภาพ (Gallery) -->
+    <section>
+        <h2 class="section-title lang-th">บรรยากาศและสิ่งอำนวยความสะดวก</h2>
+        <h2 class="section-title lang-en" style="display: none;">Atmosphere & Facilities</h2>
+        <h2 class="section-title lang-cn" style="display: none;">环境与设施</h2>
+
+        <div class="gallery">
+            <div class="gallery-item">
+                <img src="pic/1.jpg" alt="โรงแรมสมายเพลส">
+                <div class="gallery-caption lang-th">อาคารที่พักและที่จอดรถกว้างขวาง</div>
+                <div class="gallery-caption lang-en" style="display: none;">Spacious Building & Parking</div>
+                <div class="gallery-caption lang-cn" style="display: none;">宽敞的住宿楼和停车场</div>
+            </div>
+            
+            <div class="gallery-item">
+                <img src="pic/9.jpg" alt="โรงแรมสมายเพลส">
+                <div class="gallery-caption lang-th">"ยินดีต้อนรับ"</div>
+                <div class="gallery-caption lang-en" style="display: none;">Welcome</div>
+                <div class="gallery-caption lang-cn" style="display: none;">欢迎光临</div>
+            </div>
+            
+            <div class="gallery-item">
+                <img src="pic/12.jpg" alt="โรงแรมสมายเพลส">
+                <div class="gallery-caption lang-th">แผนกต้อนรับ</div>
+                <div class="gallery-caption lang-en" style="display: none;">Front Desk</div>
+                <div class="gallery-caption lang-cn" style="display: none;">前台接待</div>
+            </div>
+            
+            <div class="gallery-item">
+                <img src="pic/8.jpg" alt="ห้องพัก">
+                <div class="gallery-caption lang-th">ห้องพักเตียงคู่ (Single Beds Room)</div>
+                <div class="gallery-caption lang-en" style="display: none;">Single Beds Room</div>
+                <div class="gallery-caption lang-cn" style="display: none;">双床房</div>
+            </div>
+
+            <div class="gallery-item">
+                <img src="pic/11.jpg" alt="ห้องพัก">
+                <div class="gallery-caption lang-th">ห้องพักเตียงเดี่ยว(Double Bed Room)</div>
+                <div class="gallery-caption lang-en" style="display: none;">Double Bed Room</div>
+                <div class="gallery-caption lang-cn" style="display: none;">大床房</div>
+            </div>
+
+            <div class="gallery-item">
+                <img src="pic/2.jpg" alt="ห้องพัก">
+                <div class="gallery-caption lang-th">ห้องพักกว้างขวาง พร้อมสิ่งอำนวยความสะดวก</div>
+                <div class="gallery-caption lang-en" style="display: none;">Spacious Room with Amenities</div>
+                <div class="gallery-caption lang-cn" style="display: none;">宽敞的客房和完善的设施</div>
+            </div>
+
+            <div class="gallery-item">
+                <img src="pic/7.jpg" alt="สิ่งอำนวยความสะดวก">
+                <div class="gallery-caption lang-th">มุมแต่งตัวและโต๊ะทำงาน</div>
+                <div class="gallery-caption lang-en" style="display: none;">Dressing & Working Table</div>
+                <div class="gallery-caption lang-cn" style="display: none;">梳妆台与办公桌</div>
+            </div> 
+
+            <div class="gallery-item">
+                <img src="pic/3.jpg" alt="สถานีชาร์จรถยนต์ไฟฟ้า">
+                <div class="gallery-caption lang-th">สถานีชาร์จรถยนต์ไฟฟ้า (EV Station)</div>
+                <div class="gallery-caption lang-en" style="display: none;">EV Charging Station</div>
+                <div class="gallery-caption lang-cn" style="display: none;">电动汽车充电站</div>
+            </div>
+
+            <div class="gallery-item">
+                <img src="pic/10.jpg" alt="คาเฟ่">
+                <div class="gallery-caption lang-th">ฟรีอาหารเช้า</div>
+                <div class="gallery-caption lang-en" style="display: none;">Free Breakfast</div>
+                <div class="gallery-caption lang-cn" style="display: none;">免费早餐</div>
+            </div>
+            
+            <div class="gallery-item">
+                <img src="pic/5.jpg" alt="คาเฟ่">
+                <div class="gallery-caption lang-th">บรรยากาศยามเช้า</div>
+                <div class="gallery-caption lang-en" style="display: none;">Morning Atmosphere</div>
+                <div class="gallery-caption lang-cn" style="display: none;">清晨的氛围</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ส่วนท้าย (Footer) -->
+    <footer class="footer">
+        <div class="footer-col">
+            <h3 class="lang-th">ห้างหุ้นส่วนจำกัด สมายเพลส 2016</h3>
+            <h3 class="lang-en" style="display: none;">Smile Place 2016 LTD.</h3>
+            <h3 class="lang-cn" style="display: none;">Smile Place 2016 有限公司</h3>
+            
+            <p class="lang-th">📍 เลขที่ 209/38-39 หมู่ 2 ต.ดอยแก้ว อ.จอมทอง จ.เชียงใหม่ 50160</p>
+            <p class="lang-en" style="display: none;">📍 209/38-39 Moo 2, T. Doi Kaeo, A. Chom Thong, Chiang Mai 50160</p>
+            <p class="lang-cn" style="display: none;">📍 清迈府宗通县 Doi Kaeo镇 2村 209/38-39号，邮编 50160</p>
+            
+            <p class="lang-th">📱 โทร: 053-341155, 065-7538313, 064-3322345</p>
+            <p class="lang-en" style="display: none;">📱 Tel: 053-341155, 065-7538313, 064-3322345</p>
+            <p class="lang-cn" style="display: none;">📱 电话: 053-341155, 065-7538313, 064-3322345</p>
+        </div>
+        
+        <div class="footer-col">
+            <h3 class="lang-th">สิ่งอำนวยความสะดวก</h3>
+            <h3 class="lang-en" style="display: none;">Facilities</h3>
+            <h3 class="lang-cn" style="display: none;">酒店设施</h3>
+            <ul style="list-style-type: none; padding: 0; color: #b0bec5; line-height: 1.8;">
+                <li class="lang-th">✔️ ฟรี Wi-Fi</li>
+                <li class="lang-en" style="display: none;">✔️ Free Wi-Fi</li>
+                <li class="lang-cn" style="display: none;">✔️ 免费 Wi-Fi</li>
+                
+                <li class="lang-th">✔️ ที่จอดรถกว้างขวาง</li>
+                <li class="lang-en" style="display: none;">✔️ Spacious Parking</li>
+                <li class="lang-cn" style="display: none;">✔️ 宽敞的停车场</li>
+                
+                <li class="lang-th">✔️ สถานีชาร์จ EV</li>
+                <li class="lang-en" style="display: none;">✔️ EV Charging Station</li>
+                <li class="lang-cn" style="display: none;">✔️ 电动汽车充电站</li>
+                
+                <li class="lang-th">✔️ พนักงานต้อนรับ 24 ชั่วโมง</li>
+                <li class="lang-en" style="display: none;">✔️ 24-Hour Front Desk</li>
+                <li class="lang-cn" style="display: none;">✔️ 24小时前台服务</li>
+
+                <li class="lang-th">✔️ ฟรีอาหารเช้า</li>
+                <li class="lang-en" style="display: none;">✔️ Free Breakfast</li>
+                <li class="lang-cn" style="display: none;">✔️ 免费早餐</li>
+            </ul>
+        </div>
+    </footer>
+    <div class="footer-bottom">
+        &copy; 2024 Smile Place Hotel. All Rights Reserved.
+    </div>
+
+    <!-- สคริปต์สลับภาษา (อัปเกรดให้รองรับ 3 ภาษา) -->
+    <script>
+        function toggleLang(lang) {
+            // รายชื่อภาษาทั้งหมดในระบบ
+            const languages = ['th', 'en', 'cn'];
+            
+            languages.forEach(l => {
+                const elements = document.querySelectorAll('.lang-' + l);
+                const btn = document.getElementById('btn-' + l);
+                
+                if (l === lang) {
+                    // ภาษาที่กำลังเลือก: แสดงข้อความ และ ซ่อนปุ่มของภาษานี้
+                    elements.forEach(el => el.style.display = '');
+                    if (btn) btn.style.display = 'none';
+                } else {
+                    // ภาษาอื่น: ซ่อนข้อความ และ แสดงปุ่มให้กดเลือกได้
+                    elements.forEach(el => el.style.display = 'none');
+                    if (btn) btn.style.display = '';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
