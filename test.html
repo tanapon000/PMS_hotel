@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smile Place - ที่พักคุณภาพสูงในจอมทอง</title>
+
+    <!-- ส่วนภาษาอังกฤษ -->
+    <link rel="alternate" hreflang="en" href="https://smileplace.example/en/" />
+    
+    <style>
+        /* CSS ร่วม */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 1200px;
+            margin: auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        /* ส่วนหัว */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+        
+        /* ส่วนเมนูภาษา */
+        .lang-selector {
+            display: flex;
+            align-items: center;
+        }
+        
+        .lang-selector label {
+            margin-right: 10px;
+        }
+        
+        select.lang-selector select {
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+    </style>
+</head>
+
+<!-- ส่วนภาษาไทย -->
+<style lang="th">
+        /* CSS สำหรับภาษาไทย */
+        html[lang="th"] body {
+            font-family: "TH Sarabun New", "Sarabun", Arial, sans-serif;
+        }
+        
+        .container-th {
+            width: 100%;
+            margin: 0 auto;
+            padding: 25px;
+        }
+
+        header thaispan {
+            display: block; /* Hide English header */
+        }
+        
+        header english-selector label:first-child { /* HTML structure adjustment needed for proper targeting */
+            content: "Thailand";
+        }
+    </style>
+    
+</head>
+
+<body>
+    <div class="container">
+        <!-- ส่วนหัว -->
+        <header lang="th" dir="ltr">
+            <a href="#" class="logo">Smile Place</a>
+            
+            <div class="lang-selector">
+                <label>ภาษา:</label>
+                <select onchange="switchLanguage(this.value)">
+                    <option value="th">&#x1F1EA;&#x1F30E; ไทย</option>
+                    <option value="en">&#x1F397; English</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- ส่วนเนื้อหาหลัก -->
+    
+            <!-- ส่วนรูปถ่ายและโลโก้ -->
+        <div class="main-banner">
+            <img src="#" alt="รูปถ่ายป้าย Smile Place" />
+            <h1>Smile Place - Smile Place</h1>
+            <p>ที่พักคุณภาพสูง อ.จอมทอง จ.เชียงใหม่</p>
+        </div>
+
+        <!-- ส่วนการตั้งอยู่ -->
+        <section class="location">
+            <h2>LOCATION</h2>
+            <h3 lang="en">ที่ตั้งของเรา</h3>
+            <p lang="th">รูปถ่ายป้ายสมายเพลสติดถนนหมายเลข 108 อ.จอมทอง</p>
+            <!-- เติม CSS ให้อังกฤษอ้างอิงได้ด้วย -->
+        </section>
+
+        <!-- ส่วนห้องพัก -->
+        <div class="rooms">
+            <h2 lang="th"> OUR ROOMS</h2>
+            
+            <details open>
+                <summary>ประเภทห้องพัก (Twin Bed Room)</summary>
+                
+                <p lang="en">TWIN BED ROOM: 3.5 ft x 2 Twin Beds</p>
+                <!-- CSS เพิ่มเติมเพื่อความเป็น Thai-friendly -->
+            </details>
+
+        <!-- เนื้อหาส่วนห้องพัก, 设施等可以根据需要扩展 -->
+
+    </body>
+</html>

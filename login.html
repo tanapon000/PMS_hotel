@@ -79,12 +79,23 @@
             font-size: 14px;
             display: none;
         }
+        .btn-back {
+            display: inline-block;
+            text-decoration: none;
+            color: #757575;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .btn-back:hover {
+            color: #2196F3; /* เปลี่ยนเป็นสีฟ้าเมื่อเอาเมาส์ชี้ */
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
 <div class="login-box">
-    <h2>🏨 ระบบจัดการโรงแรม (PMS)</h2>
+    <h2>🏨 Smile Place</h2>
     
     <div id="errorMessage"></div>
 
@@ -97,6 +108,9 @@
         <input type="password" id="password" placeholder="••••••••">
     </div>
     <button class="btn-login" id="btnLogin" onclick="handleLogin()">เข้าสู่ระบบ</button>
+    <div style="margin-top: 15px;">
+    <a href="index.html" class="btn-back">← กลับไปยังหน้าหลัก</a>
+</div>
 </div>
 
 <script src="supabase.js"></script>

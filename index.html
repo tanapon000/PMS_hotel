@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โรงแรมสมายเพลส (Smile Place Hotel)</title>
-    <!-- โหลด Font จาก Google Fonts -->
+    <title>SMILE PLACE</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         /* =========================================
@@ -14,397 +13,1055 @@
             margin: 0;
             padding: 0;
             font-family: 'Prompt', sans-serif;
-            background-color: #f8f9fa;
+            background-color: #ffffff; /* ใช้พื้นหลังขาวเพื่อให้กลืนกับขอบรูปล่าง */
             color: #333;
             scroll-behavior: smooth;
+            line-height: 1.5;
         }
         
-        * {
-            box-sizing: border-box;
+        * { box-sizing: border-box; }
+
+        /* =========================================
+           ส่วนรูปพื้นหลังหน้าแรก (Hero Background)
+           ========================================= */
+        .hero-bg {
+            position: absolute;
+            top: 0;           /* ชนขอบบนสุดของจอ */
+            left: 50%;
+            transform: translateX(-50%); /* จัดให้อยู่กึ่งกลางจอ */
+            width: 100%;
+            max-width: 1100px; 
+            height: 50vh;      /* ความสูงของรูปภาพ */
+            z-index: 0;       /* ดันไปไว้เลเยอร์หลังสุด */
+            
+            /* เทคนิคไล่สีขาวที่ขอบบน (ให้โลโก้อ่านชัด) และขอบล่าง (ให้กลืนกับหน้าเว็บ) */
+            background-image: 
+                linear-gradient(to bottom, rgba(255,255,255,0) 10%, rgba(255,255,255,1) 100%), 
+                url('pic/1.jpg');
+            background-size: cover;
+            background-position: center top;
         }
 
         /* =========================================
-           แถบ Navigation Bar ด้านบน
+           ส่วนหัว: โลโก้บนสุด และ Navigator
            ========================================= */
+        header {
+            width: 100%;
+            position: relative; /* 🟢 เพิ่มบรรทัดนี้ */
+            z-index: 10;        /* 🟢 เพิ่มบรรทัดนี้ */
+            background: transparent; /* โปร่งใสเพื่อให้เห็นรูปพื้นหลังด้านล่าง */
+        }
+
+        .top-logo-area {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            
+        }
+
+        .logo-text {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-text span:first-child { font-size: 24px; }
+        .logo-text span:last-child { font-size: 14px; letter-spacing: 2px; }
+
+        .top-actions {
+            position: absolute;
+            top: 15px;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1100;
+        }
+
+        /* สไตล์ปุ่มกด Dropdown */
+        .lang-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .lang-dropbtn {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 4px 6px;
+            font-size: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: background 0.3s;
+        }
+
+        .lang-dropbtn:hover { background-color: #f9f9f9; }
+
+        /* สไตล์กล่องรายการภาษาที่จะหล่นลงมา */
+        .lang-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0; /* ให้กล่องขยายไปทางซ้าย ไม่ล้นจอ */
+            background-color: #ffffff;
+            min-width: 130px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.15);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* สไตล์ลิงก์ภาษาแต่ละอัน */
+        .lang-dropdown-content a {
+            color: #333;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .lang-dropdown-content a:hover {
+            background-color: #f1f1f1;
+            color: #654000;
+        }
+
+        /* แสดง Dropdown เมื่อเอาเมาส์ชี้ที่กล่อง */
+        .lang-dropdown:hover .lang-dropdown-content {
+            display: block;
+        }
+
+        /* ปรับแต่งปุ่ม Login ให้เข้าชุดกัน */
+
+        .login-btn:hover { background-color: #0d47a1; }
         .navbar {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            background-color: #ffffff;
-            padding: 15px 50px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 1100px;
+            margin: 0 auto;
+            overflow: hidden;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: rgba(128, 128, 128, 0.4); 
+            backdrop-filter: blur(5px); 
+            -webkit-backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
-        .logo-container {
+        .nav-menu {
             display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-container h1 {
+            gap: 25px;
+            list-style: none;
+            padding: 0;
             margin: 0;
-            font-size: 24px;
-            color: #654000; /* สีน้ำตาลสไตล์โลโก้ */
+            flex: 1;
+            justify-content: center;
         }
 
-        .nav-links {
+        .nav-menu li a {
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            text-shadow: #1a1a1a 0px 0px 3px;
+            transition: color 0.3s;
+        }
+
+        .nav-menu li a:hover { color: #654000; }
+
+        .nav-actions {
             display: flex;
-            gap: 15px; /* ปรับลด gap ลงนิดหน่อยเพื่อเพิ่มปุ่ม */
+            gap: 8px;
             align-items: center;
         }
 
         .lang-btn {
-            background: none;
-            border: 1px solid #ccc;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: 500;
-            transition: all 0.2s;
+            background: #fff; border: 1px solid #ccc; padding: 4px 8px;
+            border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 12px;
         }
-
-        .lang-btn:hover {
-            background: #e0e0e0;
-        }
-
-        /* ปุ่มเข้าสู่ระบบ PMS */
         .login-btn {
-            background-color: #1565c0; /* สีน้ำเงินเข้ม */
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: 10px;
-        }
-
-        .login-btn:hover {
-            background-color: #0d47a1;
+            background-color: #1565c0; color: white; text-decoration: none;
+            padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 12px;
         }
 
         /* =========================================
-           ส่วนหัว (Hero Section)
+           ส่วนหน้าหลัก (Hero Section): ตัวหนังสือมุมขวา
            ========================================= */
-        .hero {
-            position: relative;
-            height: 70vh;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('pic/6.jpg'); 
-            background-size: cover;
-            background-position: center;
+        .hero-section {
+            position: relative; /* 🟢 เพิ่มบรรทัดนี้ */
+            z-index: 10;        /* 🟢 เพิ่มบรรทัดนี้ */
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            /* หักความสูงของ Header ออก เพื่อให้กล่องข้อความอยู่พอดีขอบล่างของภาพ */
+            height: calc(50vh - 120px); 
             display: flex;
-            flex-direction: column;
+            justify-content: flex-end; /* จัดแนวนอนชิดขวา */
+            align-items: flex-end;     /* จัดแนวตั้งชิดล่าง */
+            padding-bottom: 50px;      /* ยกข้อความขึ้นมาจากขอบล่างนิดนึง */
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.14);
+        }
+
+        .hero-text-content {
+            margin-right: 60px; /* เว้นระยะจากขอบขวา */
+            text-align: right;
+            max-width: 600px;
+        }
+
+        .hero-text-content h1 {
+            font-size: 3.2rem;
+            margin: 0;
+            color: #563700;
+            font-weight: bold;
+            line-height: 1.1;
+        }
+
+        .hero-text-content h2 {
+            font-size: 1.6rem;
+            margin: 10px 0;
+            color: #333;
+            font-weight: 400;
+        }
+
+        .hero-text-content p {
+            font-size: 1.2rem;
+            color: #444;
+            margin: 0;
+        }
+
+        .page-section {
+            background-color: #fff;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+        .page-section-rooms {
+            background-color: #fff;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .img-placeholder {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 100%;
+            display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            color: white;
-            padding: 0 20px;
         }
 
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        .img-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .hero p {
-            font-size: 1.5rem;
-            max-width: 800px;
-            margin-bottom: 30px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
-
-        /* =========================================
-           ส่วนแสดงรูปภาพ (Gallery Section)
-           ========================================= */
-        .section-title {
-            text-align: center;
-            font-size: 2.2rem;
-            color: #814402;
-            margin: 50px 0 30px 0;
-            position: relative;
+        .flex-row { display: flex; gap: 30px; flex-wrap: wrap; margin-bottom: 20px; }
+        .flex-col { flex: 1; min-width: 300px; }
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .booking-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 140px; /* ขนาดช่องของแต่ละโลโก้ */
+            height: 80px;
+            transition: transform 0.3s ease;
+            filter: grayscale(20%); /* ทำเป็นสีจางนิดๆ เพื่อความสวยงาม */
         }
         
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 4px;
-            background-color: #2e7d32;
-            margin: 10px auto 0 auto;
-            border-radius: 2px;
+        .booking-item:hover {
+            transform: scale(1.1);
+            filter: grayscale(0%);
         }
 
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 0 50px;
-            max-width: 1200px;
-            margin: 0 auto 50px auto;
+        .booking-item img {
+            max-width: 100%;
+            max-height: 100px; /* คุมความสูงโลโก้ให้เท่ากัน */
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.2));
         }
 
-        .gallery-item {
-            overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-            background: white;
+        #rooms h2 {
+                margin-top: -15px ;       
+                margin-bottom: 40px ;
+                font-size: 2.2rem ;
+                color: #fff; 
+                font-weight: bold;
+            }
+        #facilities h2 {
+                margin-top: -15px ;       
+                margin-bottom: 40px ;
+                font-size: 2.2rem ;
+                color: #654000; 
+                font-weight: bold;
+            }
+        #breakfast h2 {
+                margin: 0;
+                margin-top: -30px ;       
+                margin-bottom: 10px ;
+                font-size: 2.2rem ;
+                color: #654000; 
+                font-weight: bold;
+                letter-spacing: 1px;
+            }
+        #ev-station h2 {
+                margin-top: -15px ;      
+                margin-bottom: 0px ;
+                font-size: 2.2rem ;
+            }
+        #location h2 {
+                margin-top: -15px ;       
+                margin-bottom: 40px ;
+                font-size: 2.2rem ;
+                color: #fff; 
+                font-weight: bold
+            }   
+        #booking h2 {
+                margin-top: -15px ;       
+                margin-bottom: 10px ;
+                font-size: 2.2rem ;
+                color: #654000; 
+                font-weight: bold;
+                letter-spacing: 2px;
+            }
+        #contact { 
+                padding: 5px 10px !important; 
+        }
+        #contact h2 {
+                margin-top: 15px ;       
+                margin-bottom: 0px ;
+                font-size: 2.0rem ; 
+                color: #fff; 
+                font-weight: bold;
+                letter-spacing: 2px;
+        }
+            
+        #contact .flex-row {
+                gap: 20px ;
         }
 
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .gallery-caption {
-            padding: 15px;
-            text-align: center;
-            font-weight: 500;
-            color: #555;
-            font-size: 1.1rem;
-        }
-
-        /* =========================================
-           ส่วนติดต่อเรา (Footer)
-           ========================================= */
-        .footer {
-            background-color: #263238;
-            color: white;
-            padding: 40px 50px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 30px;
-        }
-
-        .footer-col {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .footer-col h3 {
-            color: #81c784;
-            margin-top: 0;
-        }
-
-        .footer-col p {
-            line-height: 1.6;
-            margin: 5px 0;
-            color: #b0bec5;
-        }
-
-        .footer-bottom {
-            background-color: #1c262a;
-            color: #78909c;
-            text-align: center;
-            padding: 15px 0;
-            font-size: 0.9rem;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .navbar { padding: 15px 20px; flex-direction: column; gap: 10px; }
-            .nav-links { flex-wrap: wrap; justify-content: center; }
-            .hero h1 { font-size: 2.5rem; }
-            .hero p { font-size: 1.2rem; }
-            .gallery { padding: 0 20px; }
-            .footer { padding: 30px 20px; }
+            .navbar { flex-direction: column; padding: 0px; }
+            .nav-menu { flex-wrap: wrap; gap: 5px; margin: 5px 0; }
+            .nav-menu li a {
+            font-size: 11px;
+            font-weight: 500;
+            }
+            .hero-bg { height: 60vh; }
+            .hero-section { height: calc(60vh - 120px); justify-content: center; padding-bottom: 20px; }
+            .hero-text-content { margin-right: 0; text-align: center; width: 100%; padding: 0 20px; }
+            .hero-text-content h1 { font-size: 2.0rem; }
+            .hero-text-content h2 { font-size: 1.0rem; }
+            .page-section, .page-section-rooms { padding: 10px 10px !important; }
+            .page-section h2, .page-section-rooms h2, #facilities h2, #ev-station h2, #contact h2 {
+                margin-bottom: 20px !important; 
+                font-size: 1.8rem !important;
+            }
+            section:not([id]).page-section h3 { 
+                font-size: 1.2rem !important; 
+                margin-bottom: 5px !important; 
+            }
+            section:not([id]).page-section p { 
+                font-size: 0.9rem !important; 
+            }
+            #amenities2 {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important; /* เปิดใช้งานการเลื่อนแนวนอน */
+                scroll-snap-type: x mandatory; /* ให้การปัดหยุดลงล็อคพอดี */
+                -webkit-overflow-scrolling: touch; /* ให้การปัดบนมือถือลื่นไหล */
+                gap: 15px !important;
+                padding-bottom: 15px !important; /* เว้นที่ให้แถบ Scroll */
+            }
+            #amenities2 > div {
+                /* แบ่งความกว้างให้แสดง 2 รูปพอดี (หักลบช่องว่าง 15px) */
+                flex: 0 0 calc(40% - 7.5px) !important; 
+                scroll-snap-align: start; /* เวลาหยุดปัดให้ชิดขอบพอดี */
+            }
+            /* ซ่อนแถบ Scrollbar เพื่อความสวยงาม (เลือกใช้ได้) */
+            #amenities2::-webkit-scrollbar { height: 4px; }
+            #amenities2::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+            #facilities h2 { margin-top: 5px !important;  }  
+            #rooms h2 { margin-top: 15px !important; }
+            #facilities > div:first-of-type {
+                grid-template-columns: repeat(4, 1fr) !important; /* บังคับให้เรียง 4 คอลัมน์ */
+                gap: 8px !important; /* ลดช่องไฟลงเพื่อไม่ให้เบียดเกินไป */
+                margin-bottom: 30px !important;
+            }
+            #facilities > div:first-of-type .img-placeholder {
+                height: 45px !important; /* ย่อขนาดไอคอนลงให้พอดีจอ */
+                margin-bottom: 5px !important;
+            }
+            #facilities > div:first-of-type p {
+                font-size: 11px !important; /* ลดขนาดตัวอักษรใต้ไอคอน */
+                line-height: 1.2 !important;
+                margin-top: 5px !important;
+                margin-bottom: 0 !important;
+            }
+            #facilities > div:first-of-type div {
+                font-size: 11px !important; /* บังคับเผื่อกรณี font-size ฝังอยู่ใน div */
+            }
+
+            #facilities > div:last-of-type {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+            .breakfast-container { flex-direction: column !important; align-items: center !important; }
+            .breakfast-img { width: 100% !important; margin-bottom: 10px !important; }
+            .breakfast-text-box { 
+                position: relative !important; 
+                top: 0 !important; 
+                left: 0 !important; 
+                transform: none !important; 
+                width: 100% !important; 
+                padding: 25px !important;
+                margin-top: -50px;
+                z-index: 2;
+                border-left: 10px solid #654000 !important;
+            }
+            #breakfast div[style*="text-align: right"] { 
+                text-align: center !important; 
+                margin-bottom: 10px !important; 
+            }
+            #breakfast h2 { font-size: 1.8rem !important;margin-top: 15px; }
+            #breakfast h3 { font-size: 1.1rem !important; }
+            
+            /* ปรับขนาดข้อความรายละเอียดของอาหารเช้า */
+            #breakfast p[style*="font-size: 1.5rem"] { 
+                font-size: 1.2rem !important; 
+                text-align: center !important;
+            }
+            #breakfast div[style*="font-size: 1.2rem"] { 
+                font-size: 1rem !important; 
+                text-align: center !important;
+            }
+
+            #booking { padding: 30px 0 !important; }
+            #contact { padding: 40px 15px !important; }
+            
+            #ev-station > div {
+                background-image: linear-gradient(to bottom, rgba(255,255,255,0.95) 50%, rgba(255,255,255,0.3) 100%), url('pic/3.jpg') !important;
+                min-height: auto;
+            }
+            #ev-station {
+                padding: 10px 0 !important; /* ลด Padding บน-ล่างของ Section */
+            }
+            #ev-station > div {
+                margin-top: 20px !important;
+                margin-bottom: 0 !important;
+            }
+            #ev-station div[style*="padding: 60px"] {
+                padding: 30px 15px !important;
+                text-align: center;
+            }
+            #ev-station h3 {
+                margin-top: 5px !important;    /* ลดระยะห่างด้านบน */
+                margin-bottom: 10px !important; /* ลดระยะห่างด้านล่าง */
+                font-size: 1.5rem !important;   /* ปรับขนาดตัวอักษรให้พอดีมือถือ */
+            }
+            #ev-station h2 {
+                margin-top: 0px !important;       /* ลดระยะห่างด้านบน */
+                margin-bottom: 0px !important;
+                font-size: 1.8rem !important;
+            }
+            #ev-station div[style*="padding: 60px"], 
+            #ev-station div[style*="padding: 40px"] {
+                padding: 20px 15px !important; 
+            }
+        
+            #ev-station ul {
+                display: inline-block;
+                text-align: left;
+            }
+            #location h2 { margin-top: 15px !important; }
+            #location .flex-row {
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 0px !important;
+            }
+            #location .flex-col:first-child {
+                width: 100% !important;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            #location .flex-col:first-child .img-placeholder {
+                width: 80% !important; 
+                max-width: 300px !important;
+                margin: 0 auto !important;
+            }
+            #location .flex-col:last-child {
+                width: 100% !important; 
+                margin-top: 20px !important;
+            }
+            .booking-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 15px !important;
+            }
+            .booking-item {
+                width: 100%;
+                height: auto;
+            }
+            .booking-item img {
+                max-height: 55px !important; /* ปรับขนาดโลโก้ลงเล็กน้อยเพื่อให้ 3 ช่องไม่เบียดกันเกินไปในจอมือถือ */
+                width: 100% !important;
+                object-fit: contain !important;
+            }
+            #contact h2 { margin-top: -15px !important;margin-bottom: -10px !important; }
+            #contact .flex-row {
+                flex-direction: column !important;
+                text-align: center !important;
+            }
+            #contact .flex-col {
+                text-align: center !important;
+                width: 100% !important;
+            }
+            .top-actions {
+                top: 10px;
+                right: 15px;
+            }
+            
         }
     </style>
 </head>
 <body>
 
-    <!-- แถบนำทาง (Navbar) -->
-    <nav class="navbar">
-        <div class="logo-container">
-            <img src="pic/logo.png" alt="Smile Place Logo" style="height: 50px;">
-            <h1 class="lang-th">โรงแรมสมายเพลส</h1>
-            <h1 class="lang-en" style="display: none;">Smile Place Hotel</h1>
-            <h1 class="lang-cn" style="display: none;">微笑广场酒店</h1>
+    <div class="hero-bg"></div>
+<header style="position: relative;max-width: 1100px ;margin: 0 auto;">
+        <div class="top-actions">
+            <div class="lang-dropdown">
+                <button class="lang-dropbtn">🌐 Language ▾</button>
+                <div class="lang-dropdown-content">
+                    <a href="#" onclick="toggleLang('th'); return false;">🇹🇭 ไทย (TH)</a>
+                    <a href="#" onclick="toggleLang('en'); return false;">🇬🇧 English (EN)</a>
+                    <a href="#" onclick="toggleLang('cn'); return false;">🇨🇳 中文 (CN)</a>
+                </div>
+            </div>
+            <a href="login.html" class="login-btn">Login</a>
         </div>
-        <div class="nav-links">
-            <!-- เพิ่มปุ่ม 3 ภาษา -->
-            <button class="lang-btn" onclick="toggleLang('en')" id="btn-en">🇬🇧 English</button>
-            <button class="lang-btn" onclick="toggleLang('cn')" id="btn-cn">🇨🇳 中文</button>
-            <button class="lang-btn" onclick="toggleLang('th')" id="btn-th" style="display: none;">🇹🇭 ภาษาไทย</button>
-            
-            <!-- ปุ่มสำหรับเข้าสู่ระบบ PMS -->
-            <a href="login.html" class="login-btn">
-                <span class="lang-th">🔒 เข้าสู่ระบบพนักงาน</span>
-                <span class="lang-en" style="display: none;">🔒 Staff Login</span>
-                <span class="lang-cn" style="display: none;">🔒 员工登录</span>
+
+        <div class="top-logo-area">
+            <a href="#home" class="logo-text">
+                <img src="pic/logo2.png" alt="SMILE PLACE Logo" style="width: 60px; height: auto; margin-bottom: 5px;">
+                <span class="lang-th">สมายเพลส</span>
+                <span class="lang-en" style="display:none;">SMILE PLACE</span>
+                <span class="lang-cn" style="display:none;">微笑广场酒店</span>
+                <span class="lang-th" style="font-size: 1.5rem;">SMILE PLACE</span>
+                <span class="lang-en" style="font-size: 1.5rem; display:none;"></span>
+                <span class="lang-cn" style="font-size: 1.5rem; display:none">SMILE PLACE</span>
             </a>
         </div>
-    </nav>
 
-    <!-- ส่วนหัว (Hero) -->
-    <header class="hero">
-        <h1 class="lang-th">ยินดีต้อนรับสู่ โรงแรมสมายเพลส</h1>
-        <h1 class="lang-en" style="display: none;">Welcome to Smile Place Hotel</h1>
-        <h1 class="lang-cn" style="display: none;">欢迎来到微笑广场酒店</h1>
-        
-        <p class="lang-th">พักผ่อนอย่างสบายใจ ในราคาที่คุ้มค่า พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
-        <p class="lang-en" style="display: none;">Relax comfortably at a great value, complete with full amenities.</p>
-        <p class="lang-cn" style="display: none;">以超值的价格享受舒适的住宿和完善的设施。</p>
+        <nav class="navbar">
+            <ul class="nav-menu">
+                <li><a href="#home" class="lang-th">หน้าหลัก</a><a href="#home" class="lang-en" style="display:none;">Home</a><a href="#home" class="lang-cn" style="display:none;">首页</a></li>
+                <li><a href="#rooms" class="lang-th">ประเภทห้องพัก</a><a href="#rooms" class="lang-en" style="display:none;">Rooms</a><a href="#rooms" class="lang-cn" style="display:none;">客房类型</a></li>
+                <li><a href="#facilities" class="lang-th">สิ่งอำนวยความสะดวก</a><a href="#facilities" class="lang-en" style="display:none;">Amenities</a><a href="#facilities" class="lang-cn" style="display:none;">设施服务</a></li>
+                <li><a href="#location" class="lang-th">ที่ตั้ง</a><a href="#location" class="lang-en" style="display:none;">Location & Attractions</a><a href="#location" class="lang-cn" style="display:none;">位置与地标</a></li>
+                <li><a href="#booking" class="lang-th">ช่องทางการจอง</a><a href="#booking" class="lang-en" style="display:none;">Reservation</a><a href="#booking" class="lang-cn" style="display:none;">预订渠道</a></li>
+                <li><a href="#contact" class="lang-th">ติดต่อเรา</a><a href="#contact" class="lang-en" style="display:none;">Contact Us</a><a href="#contact" class="lang-cn" style="display:none;">联系我们</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <!-- แกลลอรี่รูปภาพ (Gallery) -->
-    <section>
-        <h2 class="section-title lang-th">บรรยากาศและสิ่งอำนวยความสะดวก</h2>
-        <h2 class="section-title lang-en" style="display: none;">Atmosphere & Facilities</h2>
-        <h2 class="section-title lang-cn" style="display: none;">环境与设施</h2>
-
-        <div class="gallery">
-            <div class="gallery-item">
-                <img src="pic/1.jpg" alt="โรงแรมสมายเพลส">
-                <div class="gallery-caption lang-th">อาคารที่พักและที่จอดรถกว้างขวาง</div>
-                <div class="gallery-caption lang-en" style="display: none;">Spacious Building & Parking</div>
-                <div class="gallery-caption lang-cn" style="display: none;">宽敞的住宿楼和停车场</div>
-            </div>
+    <section id="home" class="hero-section">
+        <div class="hero-text-content">
+            <h1 class="lang-th" >สมายเพลส</h1>
+            <h1 class="lang-en" style="display:none;">SMILE PLACE</h1>
+            <h1 class="lang-cn" style="display:none;">微笑广场酒店</h1>
             
-            <div class="gallery-item">
-                <img src="pic/9.jpg" alt="โรงแรมสมายเพลส">
-                <div class="gallery-caption lang-th">"ยินดีต้อนรับ"</div>
-                <div class="gallery-caption lang-en" style="display: none;">Welcome</div>
-                <div class="gallery-caption lang-cn" style="display: none;">欢迎光临</div>
-            </div>
+            <p class="lang-th" style="font-style: italic; color: #8a5300;">ที่พักทำเลดี เดินทางง่าย พักผ่อนสบาย พร้อมความสะดวกครบครัน</p>
+            <p class="lang-en" style="font-style: italic; color: #8a5300; display:none">Comfortable stays. Complete convenience.</p>
+            <p class="lang-cn" style="font-style: italic; color: #8a5300; display:none">舒适住宿。尽享便利。</p>
             
-            <div class="gallery-item">
-                <img src="pic/12.jpg" alt="โรงแรมสมายเพลส">
-                <div class="gallery-caption lang-th">แผนกต้อนรับ</div>
-                <div class="gallery-caption lang-en" style="display: none;">Front Desk</div>
-                <div class="gallery-caption lang-cn" style="display: none;">前台接待</div>
-            </div>
+            <p class="lang-th" style="font-style: italic; color: #8a5300;">Comfortable stays. Complete convenience.</p>
+            <p class="lang-en" style="font-style: italic; color: #8a5300; display:none;">Great location, easy travel, comfortable stay with full amenities.</p>
+            <p class="lang-cn" style="font-style: italic; color: #8a5300; display:none;">位置优越，出行便利，住宿舒适，设施齐全。</p>
+        </div>
+    </section>
+
+    <section class="page-section">
+        <div class="flex-row" style="align-items: center; gap: 40px; margin-bottom: 20px;">
             
-            <div class="gallery-item">
-                <img src="pic/8.jpg" alt="ห้องพัก">
-                <div class="gallery-caption lang-th">ห้องพักเตียงคู่ (Single Beds Room)</div>
-                <div class="gallery-caption lang-en" style="display: none;">Single Beds Room</div>
-                <div class="gallery-caption lang-cn" style="display: none;">双床房</div>
+            <div class="flex-col" style="flex: 1; text-align: left;">
+                <h2 class="lang-th" style="color: #8a5300; font-size: 1rem; margin: 0 0 0px 0; line-height: 1.4;">สัมผัสการพักผ่อนที่เรียบง่าย ท่ามกลางธรรมชาติของอำเภอจอมทอง</h2>
+                <h2 class="lang-en" style="color: #8a5300; font-size: 1rem; margin: 0 0 0px 0; line-height: 1.4; display:none;">Experience simple relaxation amidst nature in Chom Thong</h2>
+                <h2 class="lang-cn" style="color: #8a5300; font-size: 1rem; margin: 0 0 0px 0; line-height: 1.4; display:none;">在宗通县的大自然中体验简单的放松</h2>
+
+                <h3 class="lang-th" style="color: #563700; margin: 0 0 -10px 0; font-size: 3rem;">สมายเพลส</h3>
+                <h3 class="lang-en" style="color: #563700; margin: 0 0 -10px 0; font-size: 3rem; display:none;">SMILE PLACE</h3>
+                <h3 class="lang-cn" style="color: #563700; margin: 0 0 -10px 0; font-size: 3rem; display:none;">微笑广场酒店</h3>
+
+                <div style="color: #563700; font-size: 1.1rem; line-height: 1.5;">
+                    <p class="lang-th">ห้องพักสมายเพลส ให้บริการห้องพักมาตรฐาน จํานวน 54 ห้อง พร้อมสิ่งอำนวยความสะดวกครบครัน ตั้งอยู่ในอำเภอจอมทอง จังหวัดเชียงใหม่ ใกล้แหล่งท่องเที่ยวสำคัญ เดินทางสะดวก</p>
+                    <p class="lang-en" style="display:none;">Smile Place offers 54 standard rooms with full amenities. Located in Chom Thong, Chiang Mai, close to major attractions, easy to travel.</p>
+                    <p class="lang-cn" style="display:none;">微笑广场酒店提供54间标准客房及完善设施。位于清迈宗通县，靠近主要景点，交通便利。</p>
+
+                    <p class="lang-th">โอบล้อมด้วยวิวทุ่งนาและขุนเขา ให้คุณได้สัมผัสความเงียบสงบและความสดชื่นจากรรรมชาติอย่างแท้จริง พร้อมบริการที่จอดรถกว้างขวาง จุดชาร์จรถไฟฟ้า และอาหารเช้า เพื่อให้ทุกการเข้าพักของคุณสะดวกสบาย คุ้มค่า และน่าประทับใจ</p>
+                    <p class="lang-en" style="display:none;">Surrounded by rice fields and mountains, experience true tranquility and freshness from nature. With spacious parking, EV charging station, and breakfast. To make your stay comfortable, worthwhile, and memorable.</p>
+                    <p class="lang-cn" style="display:none;">周围环绕着稻田和山景，体验真正的宁静与自然清新提供宽敞停车场、电动车充电站及早餐。让您的每一次入住都舒适、超值且难忘。</p>
+
+                </div>
             </div>
 
-            <div class="gallery-item">
-                <img src="pic/11.jpg" alt="ห้องพัก">
-                <div class="gallery-caption lang-th">ห้องพักเตียงเดี่ยว(Double Bed Room)</div>
-                <div class="gallery-caption lang-en" style="display: none;">Double Bed Room</div>
-                <div class="gallery-caption lang-cn" style="display: none;">大床房</div>
+            <div class="flex-col" style="flex: 1;">
+                <div class="img-placeholder" style="height: 400px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                    <img src="pic/6.jpg" alt="Smile Place Exterior">
+                </div>
             </div>
+        </div>
 
-            <div class="gallery-item">
-                <img src="pic/2.jpg" alt="ห้องพัก">
-                <div class="gallery-caption lang-th">ห้องพักกว้างขวาง พร้อมสิ่งอำนวยความสะดวก</div>
-                <div class="gallery-caption lang-en" style="display: none;">Spacious Room with Amenities</div>
-                <div class="gallery-caption lang-cn" style="display: none;">宽敞的客房和完善的设施</div>
-            </div>
-
-            <div class="gallery-item">
-                <img src="pic/7.jpg" alt="สิ่งอำนวยความสะดวก">
-                <div class="gallery-caption lang-th">มุมแต่งตัวและโต๊ะทำงาน</div>
-                <div class="gallery-caption lang-en" style="display: none;">Dressing & Working Table</div>
-                <div class="gallery-caption lang-cn" style="display: none;">梳妆台与办公桌</div>
-            </div> 
-
-            <div class="gallery-item">
-                <img src="pic/3.jpg" alt="สถานีชาร์จรถยนต์ไฟฟ้า">
-                <div class="gallery-caption lang-th">สถานีชาร์จรถยนต์ไฟฟ้า (EV Station)</div>
-                <div class="gallery-caption lang-en" style="display: none;">EV Charging Station</div>
-                <div class="gallery-caption lang-cn" style="display: none;">电动汽车充电站</div>
-            </div>
-
-            <div class="gallery-item">
-                <img src="pic/10.jpg" alt="คาเฟ่">
-                <div class="gallery-caption lang-th">ฟรีอาหารเช้า</div>
-                <div class="gallery-caption lang-en" style="display: none;">Free Breakfast</div>
-                <div class="gallery-caption lang-cn" style="display: none;">免费早餐</div>
-            </div>
+        <div id="amenities2" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-top: 30px;">
             
-            <div class="gallery-item">
-                <img src="pic/5.jpg" alt="คาเฟ่">
-                <div class="gallery-caption lang-th">บรรยากาศยามเช้า</div>
-                <div class="gallery-caption lang-en" style="display: none;">Morning Atmosphere</div>
-                <div class="gallery-caption lang-cn" style="display: none;">清晨的氛围</div>
+            <div class="text-center">
+                <div style="width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px; margin-bottom: 10px;">
+                    <img src="pic/12.jpg" alt="Reception" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                </div>
+                <div style="font-size: 1.0rem; font-weight: 500; color: #333;">
+                    <span class="lang-th">บริการต้อนรับ<br>ตลอด 24 ชั่วโมง</span>
+                    <span class="lang-en" style="display:none;">24-hour<br>Reception</span>
+                    <span class="lang-cn" style="display:none;">24小时<br>前台服务</span>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div style="width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px; margin-bottom: 10px;">
+                    <img src="pic/h4.jpg" alt="Wifi" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                </div>
+                <div style="font-size: 1.0rem; font-weight: 500; color: #333;">
+                    <span class="lang-th">Wifi ฟรี</span>
+                    <span class="lang-en" style="display:none;">Free Wifi</span>
+                    <span class="lang-cn" style="display:none;">免费Wifi</span>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div style="width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px; margin-bottom: 10px;">
+                    <img src="pic/h3.jpg" alt="CCTV" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                </div>
+                <div style="font-size: 1.0rem; font-weight: 500; color: #333;">
+                    <span class="lang-th">กล้องวงจรปิด</span>
+                    <span class="lang-en" style="display:none;">CCTV</span>
+                    <span class="lang-cn" style="display:none;">监控系统</span>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div style="width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px; margin-bottom: 10px;">
+                    <img src="pic/10.jpg" alt="Breakfast" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                </div>
+                <div style="font-size: 1.0rem; font-weight: 500; color: #333;">
+                    <span class="lang-th">ฟรีอาหารเช้า</span>
+                    <span class="lang-en" style="display:none;">Free Breakfast</span>
+                    <span class="lang-cn" style="display:none;">免费早餐</span>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div style="width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px; margin-bottom: 10px;">
+                    <img src="pic/13.jpg" alt="Parking" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                </div>
+                <div style="font-size: 1.0rem; font-weight: 500; color: #333;">
+                    <span class="lang-th">ที่จอดรถ<br>กว้างขวาง</span>
+                    <span class="lang-en" style="display:none;">Spacious<br>Parking</span>
+                    <span class="lang-cn" style="display:none;">宽敞<br>停车场</span>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div style="width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px; margin-bottom: 10px;">
+                    <img src="pic/3.jpg" alt="EV Charging" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                </div>
+                <div style="font-size: 1.0rem; font-weight: 500; color: #333;">
+                    <span class="lang-th">จุดชาร์จรถไฟฟ้า</span>
+                    <span class="lang-en" style="display:none;">EV Charging Station</span>
+                    <span class="lang-cn" style="display:none;">电动车充电站</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="rooms" class="page-section-rooms" style="background-color: #654000;">
+        <h2 class="text-center lang-th" >ประเภทห้องพัก</h2>
+        <h2 class="text-center lang-en" style=" display:none;">Room Types</h2>
+        <h2 class="text-center lang-cn" style=" display:none;">客房类型</h2>
+
+        <div class="flex-row" style="justify-content: center; gap: 30px;">
+            
+            <div class="flex-col" style="background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 450px;">
+                <div style="width: 100%; aspect-ratio: 4 / 3; overflow: hidden;">
+                    <img src="pic/8.jpg" alt="Twin Bed Room" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                
+                <div style="padding: 30px; text-align: center; color: #654000;">
+                    <h3 class="lang-th" style="margin: 0; font-size: 1.8rem; font-weight: bold;">เตียงคู่</h3>
+                    <h3 class="lang-en" style="margin: 0; font-size: 1.8rem; font-weight: bold; display:none;">Twin Bed</h3>
+                    <h3 class="lang-cn" style="margin: 0; font-size: 1.8rem; font-weight: bold; display:none;">双床房</h3>
+                    
+                    <p style="margin: 5px 0 20px 0; font-size: 1.1rem; letter-spacing: 1px; opacity: 0.9;">TWIN BED ROOM</p>
+                    
+                    <div style="margin-bottom: 25px; line-height: 1.8; font-size: 1rem; font-weight: 300;">
+                        <p class="lang-th" style="margin: 0;">เตียงขนาด 3.5 ฟุต จำนวน 2 เตียง</p>
+                        <p class="lang-en" style="margin: 0; display:none;">Two 3.5 ft single beds</p>
+                        <p class="lang-cn" style="margin: 0; display:none;">两张 3.5 英尺单人床</p>
+
+                        <p class="lang-th" style="margin: 0;">พื้นที่ห้อง (รวมระเบียงและห้องน้ำ) ประมาณ 20 ตร.ม.</p>
+                        <p class="lang-en" style="margin: 0; display:none;">Room size (incl. balcony & bathroom) approx 20 sq.m.</p>
+                        <p class="lang-cn" style="margin: 0; display:none;">房间面积（含阳台和浴室）约 20 平方米</p>
+                    </div>
+                    
+                    <div style="font-size: 1.4rem; font-weight: bold;">
+                        <span>👤 x2</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-col" style="background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 450px;">
+                <div style="width: 100%; aspect-ratio: 4 / 3; overflow: hidden;">
+                    <img src="pic/11.jpg" alt="King Bed Room" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                
+                <div style="padding: 30px; text-align: center; color: #654000;">
+                    <h3 class="lang-th" style="margin: 0; font-size: 1.8rem; font-weight: bold;">เตียงเดี่ยว</h3>
+                    <h3 class="lang-en" style="margin: 0; font-size: 1.8rem; font-weight: bold; display:none;">King Bed</h3>
+                    <h3 class="lang-cn" style="margin: 0; font-size: 1.8rem; font-weight: bold; display:none;">大床房</h3>
+                    
+                    <p style="margin: 5px 0 20px 0; font-size: 1.1rem; letter-spacing: 1px; opacity: 0.9;">KING-SIZED BED ROOM</p>
+                    
+                    <div style="margin-bottom: 25px; line-height: 1.8; font-size: 1rem; font-weight: 300;">
+                        <p class="lang-th" style="margin: 0;">เตียงขนาด 6 ฟุต จำนวน 1 เตียง</p>
+                        <p class="lang-en" style="margin: 0; display:none;">One 6 ft king-sized bed</p>
+                        <p class="lang-cn" style="margin: 0; display:none;">一张 6 英尺大床</p>
+
+                        <p class="lang-th" style="margin: 0;">พื้นที่ห้อง (รวมระเบียงและห้องน้ำ) ประมาณ 20 ตร.ม.</p>
+                        <p class="lang-en" style="margin: 0; display:none;">Room size (incl. balcony & bathroom) approx 20 sq.m.</p>
+                        <p class="lang-cn" style="margin: 0; display:none;">房间面积（含阳台和浴室）约 20 平方米</p>
+                    </div>
+
+                    <div style="font-size: 1.4rem; font-weight: bold;">
+                        <span>👤 x2</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="facilities" class="page-section text-center" style="background-color: #fff;">
+        <h2 class="lang-th" >สิ่งอำนวยความสะดวก</h2>
+        <h2 class="lang-en" style=" display:none;">FACILITIES</h2>
+        <h2 class="lang-cn" style=" display:none;">设施服务</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 60px;font-size: 20px;">
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am1.png" alt="TV" style="object-fit: contain;">
+                </div>
+                <p class="lang-th">ทีวี</p><p class="lang-en" style="display:none;">TV</p><p class="lang-cn" style="display:none;">电视</p>
+            </div>
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am2.png" alt="Fridge" style="object-fit: contain;">
+                </div>
+                <p class="lang-th">ตู้เย็น</p><p class="lang-en" style="display:none;">Refrigerator</p><p class="lang-cn" style="display:none;">冰箱</p>
+            </div>
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am3.png" alt="Air" style="object-fit: contain;">
+                </div>
+                <p class="lang-th">เครื่องปรับอากาศ</p><p class="lang-en" style="display:none;">Air Con</p><p class="lang-cn" style="display:none;">空调</p>
+            </div>
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am4.png" alt="Hairdryer" style="object-fit: contain;">
+                </div>
+                <p class="lang-th">ไดร์เป่าผม</p><p class="lang-en" style="display:none;">Hairdryer</p><p class="lang-cn" style="display:none;">吹风机</p>
+            </div>
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am5.png" alt="Wardrobe" style="object-fit: contain;">
+                </div>
+                <p class="lang-th">ตู้เสื้อผ้า</p><p class="lang-en" style="display:none;">Wardrobe</p><p class="lang-cn" style="display:none;">衣柜</p>
+            </div>
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am6.png" alt="Wifi" style="object-fit: contain;">
+                </div>
+                <p>Wifi</p>
+            </div>
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am7.png" alt="Water Heater" style="object-fit: contain;">
+                </div>
+                <p class="lang-th">เครื่องทำน้ำอุ่น</p><p class="lang-en" style="display:none;">Water Heater</p><p class="lang-cn" style="display:none;">热水器</p>
+            </div>
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am8.png" alt="Kettle" style="object-fit: contain;">
+                </div>
+                <p class="lang-th">กาต้มน้ำ</p><p class="lang-en" style="display:none;">Kettle</p><p class="lang-cn" style="display:none;">热水壶</p>
+            </div>
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am9.png" alt="Coffee" style="object-fit: contain;">
+                </div>
+                <p class="lang-th">กาแฟ</p><p class="lang-en" style="display:none;">Coffee</p><p class="lang-cn" style="display:none;">咖啡</p>
+            </div>
+            <div>
+                <div class="img-placeholder" style="height: 80px; background: none; margin-bottom: 10px;">
+                    <img src="pic/am10.png" alt="Extra Bed" style="object-fit: contain;">
+                </div>
+                <p class="lang-th">เตียงเสริม <br>(มีค่าใช้จ่าย)</p><p class="lang-en" style="display:none;">Extra Bed <br>(Additional cost)</p><p class="lang-cn" style="display:none;">加床<br>(額外費用)</p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px;">
+            <div class="img-placeholder" style="aspect-ratio: 4/5;"><img src="pic/fc1.jpg" alt="Gallery 1"></div>
+            <div class="img-placeholder" style="aspect-ratio: 4/5;"><img src="pic/fc2.jpg" alt="Gallery 2"></div>
+            <div class="img-placeholder" style="aspect-ratio: 4/5;"><img src="pic/fc3.jpg" alt="Gallery 3"></div>
+            <div class="img-placeholder" style="aspect-ratio: 4/5;"><img src="pic/fc4.jpg" alt="Gallery 4"></div>
+            <div class="img-placeholder" style="aspect-ratio: 4/5;"><img src="pic/fc5.jpg" alt="Gallery 5"></div>
+            <div class="img-placeholder" style="aspect-ratio: 4/5;"><img src="pic/fc6.jpg" alt="Gallery 6"></div>
+        </div>
+    </section>
+
+    <section id="breakfast" class="page-section" style="background-image: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url('pic/10.jpg'); background-size: cover; background-position: center; padding: 80px 40px; position: relative;">
+        
+        <div style="max-width: 1100px; margin: 0 auto;">
+            
+            <div style="text-align: right; margin-bottom: 50px;">
+                <h2 class="lang-th">อิ่มอร่อยกับอาหารเช้าฟรี</h2>
+                <h2 class="lang-en" style=" display:none;">Enjoy Free Breakfast</h2>
+                <h2 class="lang-cn" style=" display:none;">享用免费早餐</h2>
+                
+                <h3 class="lang-th" style="font-size: 1.4rem; color: #8c4d00; font-weight: 500; margin-top: 5px;">เปิดให้บริการทุกวัน ตั้งแต่เวลา 06.00-11.00 น.</h3>
+                <h3 class="lang-en" style="font-size: 1.4rem; color: #8c4d00; font-weight: 400; margin-top: 5px; display:none;">Open daily from 06:00-11:00 hrs.</h3>
+                <h3 class="lang-cn" style="font-size: 1.4rem; color: #8c4d00; font-weight: 400; margin-top: 5px; display:none;">每天 06:00-11:00 开放</h3>
+            </div>
+
+            <div class="flex-row" style="align-items: center; gap: 40px;">
+                
+                <div class="flex-col" style="flex: 1; text-align: left;">
+                    <div style="color: #444; font-size: 1.2rem; line-height: 1.5; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">
+                        <p class="lang-th" style="font-weight: bold; color: #654000; margin-top: 0px; font-size: 1.5rem;">เติมเต็มเช้าวันใหม่ของคุณด้วย ชุดอาหารเช้าแบบ A La Carte</p>
+                        <p class="lang-en" style="font-weight: bold; color: #654000; margin-top: 0px; font-size: 1.5rem; display:none;">Fulfill your morning with A La Carte breakfast set</p>
+                        <p class="lang-cn" style="font-weight: bold; color: #654000; margin-top: 0px; font-size: 1.5rem; display:none;">用单点早餐套餐开启新的一天</p>
+
+                        <p class="lang-th" style="margin: 0; margin-top: -10px;">จานหลักเลือกได้ระหว่าง American Breakfast หรือข้าวต้มหมูสับ พร้อมให้บริการขนมปังปิ้ง สลัดผัก และเครื่องดื่มหลากหลาย ฟรี เพื่อความอิ่มเอมในทุกเช้าของคุณ</p>
+                        <p class="lang-en" style="margin: 0; margin-top: -10px; display:none;">Main dish choice between American Breakfast or Minced Pork Porridge Served with free toast, salad, and variety of drinks For your fulfilling morning</p>
+                        <p class="lang-cn" style="margin: 0; margin-top: -10px; display:none;">主菜可选美式早餐或猪肉碎粥 免费提供烤面包、沙拉及各种饮品 让您每天早晨都充满活力</p>
+                    </div>
+                </div>
+
+                <div class="flex-col" style="flex: 1;">
+                    <div class="img-placeholder" style="aspect-ratio: 4 / 3; width: 100%; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+                        <img src="pic/bf1.jpg" alt="Breakfast Set" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    
+    <section id="ev-station" style="background-color: #fff; padding: 40px 0;">
+        <div style="max-width: 1100px; margin: 0 auto; position: relative; width: 100%; display: flex; align-items: center; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background-image: linear-gradient(to right, rgba(255,255,255,1) 35%, rgba(255,255,255,0) 85%), url('pic/3.jpg'); background-size: cover; background-position: center;">
+            
+            <div style="padding: 60px; width: 100%; max-width: 600px; position: relative; z-index: 2;">
+                
+                <h2 style="color: #654000; font-weight: bold; letter-spacing: 1px;">
+                    EV CHARGING STATION
+                </h2>
+                
+                <h3 class="lang-th" style="color: #333; font-size: 1.8rem; font-weight: 500; margin-bottom: 25px;">
+                    บริการจุดชาร์จรถไฟฟ้า
+                </h3>
+                <h3 class="lang-en" style="color: #333; font-size: 1.8rem; font-weight: 500; margin-bottom: 25px; display:none;">
+                    EV Charging Service
+                </h3>
+                <h3 class="lang-cn" style="color: #333; font-size: 1.8rem; font-weight: 500; margin-bottom: 25px; display:none;">
+                    电动车充电服务
+                </h3>
+
+                <div style="color: #444; font-size: 1.1rem; line-height: 2;">
+                    <p class="lang-th" style="margin: 0;"><strong>รายละเอียดข้อมูลเครื่องชาร์จ</strong></p>
+                    <p class="lang-en" style="margin: 0; display:none;"><strong>Charger Details</strong></p>
+                    <p class="lang-cn" style="margin: 0; display:none;"><strong>充电桩詳情</strong></p>
+
+                    <ul style="list-style: none; padding: 0; margin: 15px 0;">
+                        <li style="margin-bottom: 10px;">⚡ ระบบ AC Charger 22 kW 3 Phase</li>
+                        <li style="margin-bottom: 10px;">🕒 เปิดให้บริการตลอด 24 ชั่วโมง</li>
+                        <li style="margin-bottom: 10px;">🅿️ พื้นที่จอดรถกว้างขวาง</li>
+                        <li style="margin-bottom: 10px;">🔌 สามารถชาร์จไว้ได้ตลอดทั้งคืน</li>
+                    </ul>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- ส่วนท้าย (Footer) -->
-    <footer class="footer">
-        <div class="footer-col">
-            <h3 class="lang-th">ห้างหุ้นส่วนจำกัด สมายเพลส 2016</h3>
-            <h3 class="lang-en" style="display: none;">Smile Place 2016 LTD.</h3>
-            <h3 class="lang-cn" style="display: none;">Smile Place 2016 有限公司</h3>
+    <section id="location" class="page-section" style="background-color: #654000;">
+        <h2 class="text-center lang-th" >สถานที่ตั้ง</h2>
+        <h2 class="text-center lang-en" style=" display:none;">LOCATION</h2>
+        <h2 class="text-center lang-cn" style=" display:none;">位置</h2>
+
+        <div class="flex-row" style="align-items: stretch; gap: 40px;">
             
-            <p class="lang-th">📍 เลขที่ 209/38-39 หมู่ 2 ต.ดอยแก้ว อ.จอมทอง จ.เชียงใหม่ 50160</p>
-            <p class="lang-en" style="display: none;">📍 209/38-39 Moo 2, T. Doi Kaeo, A. Chom Thong, Chiang Mai 50160</p>
-            <p class="lang-cn" style="display: none;">📍 清迈府宗通县 Doi Kaeo镇 2村 209/38-39号，邮编 50160</p>
+            <div class="flex-col" style="flex: 0.8; min-width: 300px;">
+                <div class="img-placeholder" style="aspect-ratio: 3 / 4; width: 100%; max-width: 350px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                    <img src="pic/map.jpg" alt="Smile Place Sign" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="text-center mt-20">
+                    <p class="lang-th" style="font-size: 1.1rem; color: #fff;">📍 ติดถนนหมายเลข 108 หน้าที่ว่าการอำเภอจอมทอง</p>
+                    <p class="lang-en" style="font-size: 1.1rem; color: #fff; display:none;">📍 Located on Road 108, in front of the Chom Thong District Office.</p>
+                    <p class="lang-cn" style="font-size: 1.1rem; color: #fff; display:none;">📍 位于108号公路, 宗通縣辦事處對面。</p>
+                </div>
+            </div>
+
+            <div class="flex-col" style="flex: 1.2; min-width: 300px;">
+                <div style="width: 100%; height: 100%; min-height: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 1px solid #eee;">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2782.2340286010076!2d98.6768223511215!3d18.415411821063582!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30dbbaa123857615%3A0x5d09f4ee69d03f1b!2zU21pbGUgUGxhY2Ug4Liq4Lih4Liy4Lii4LmA4Lie4Lil4LiqIOC4rS7guIjguK3guKHguJfguK3guIc!5e1!3m2!1sth!2sth!4v1778234679606!5m2!1sth!2sth" 
+                    style="border:0; width: 100%; height: 100%; min-height: 400px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
             
-            <p class="lang-th">📱 โทร: 053-341155, 065-7538313, 064-3322345</p>
-            <p class="lang-en" style="display: none;">📱 Tel: 053-341155, 065-7538313, 064-3322345</p>
-            <p class="lang-cn" style="display: none;">📱 电话: 053-341155, 065-7538313, 064-3322345</p>
         </div>
+    </section>
+
+
+    <section id="booking" class="page-section" style="background-color: #fff; padding: 60px 0;">
+    <div style="max-width: 1100px; margin: 0 auto; text-align: center;">
+        <h2 class="text-center lang-th" >RESERVATION</h2>
+        <h2 class="text-center lang-en" style=" display:none;">RESERVATION</h2>
+        <h2 class="text-center lang-cn" style=" display:none;">預訂</h2>
         
-        <div class="footer-col">
-            <h3 class="lang-th">สิ่งอำนวยความสะดวก</h3>
-            <h3 class="lang-en" style="display: none;">Facilities</h3>
-            <h3 class="lang-cn" style="display: none;">酒店设施</h3>
-            <ul style="list-style-type: none; padding: 0; color: #b0bec5; line-height: 1.8;">
-                <li class="lang-th">✔️ ฟรี Wi-Fi</li>
-                <li class="lang-en" style="display: none;">✔️ Free Wi-Fi</li>
-                <li class="lang-cn" style="display: none;">✔️ 免费 Wi-Fi</li>
-                
-                <li class="lang-th">✔️ ที่จอดรถกว้างขวาง</li>
-                <li class="lang-en" style="display: none;">✔️ Spacious Parking</li>
-                <li class="lang-cn" style="display: none;">✔️ 宽敞的停车场</li>
-                
-                <li class="lang-th">✔️ สถานีชาร์จ EV</li>
-                <li class="lang-en" style="display: none;">✔️ EV Charging Station</li>
-                <li class="lang-cn" style="display: none;">✔️ 电动汽车充电站</li>
-                
-                <li class="lang-th">✔️ พนักงานต้อนรับ 24 ชั่วโมง</li>
-                <li class="lang-en" style="display: none;">✔️ 24-Hour Front Desk</li>
-                <li class="lang-cn" style="display: none;">✔️ 24小时前台服务</li>
+        <p class="lang-th" style="color: #888; margin-bottom: 50px;">คลิกที่โลโก้เพื่อทำการจองผ่านช่องทางต่างๆ</p>
+        <p class="lang-en" style="color: #888; margin-bottom: 50px; display:none;">Click on the logo to book via our channels</p>
+        <p class="lang-cn" style="color: #888; margin-bottom: 50px; display:none;">点击图标通过各渠道预订</p>
 
-                <li class="lang-th">✔️ ฟรีอาหารเช้า</li>
-                <li class="lang-en" style="display: none;">✔️ Free Breakfast</li>
-                <li class="lang-cn" style="display: none;">✔️ 免费早餐</li>
-            </ul>
+        <div class="booking-grid" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 30px; padding: 0 20px;">
+            
+            <a href="https://www.facebook.com/SmileplaceChomthong/" target="_blank" class="booking-item" style="transition: 0.3s;">
+                <img src="pic/rs1.png" alt="Facebook" style="width: 100px; height: 100px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">
+            </a>
+
+            <a href="https://line.me/ti/p/8Sse_9k9ex" target="_blank" class="booking-item" style="transition: 0.3s;">
+                <img src="pic/rs2.png" alt="Line" style="width: 100px; height: 100px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">
+            </a>
+
+            <a href="https://www.agoda.com/smile-place/hotel/chom-thong-th.html" target="_blank" class="booking-item" style="transition: 0.3s;">
+                <img src="pic/rs3.png" alt="Agoda" style="width: 100px; height: 100px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">
+            </a>
+
+            <a href="https://www.booking.com/hotel/th/smile-place-smaayephls.html" target="_blank" class="booking-item" style="transition: 0.3s;">
+                <img src="pic/rs4.png" alt="Booking" style="width: 100px; height: 100px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">
+            </a>
+
+            <a href="https://www.expedia.co.th/Chom-Thong-Hotels-Smile-Place.h49244482.Hotel-Information" target="_blank" class="booking-item" style="transition: 0.3s;">
+                <img src="pic/rs5.png" alt="Expedia" style="width: 100px; height: 100px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">
+            </a>
+
+            <a href="https://th.trip.com/hotels/detail/?hotelId=10118298" target="_blank" class="booking-item" style="transition: 0.3s;">
+                <img src="pic/rs6.png" alt="Trip" style="width: 100px; height: 100px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">
+            </a>
+
         </div>
-    </footer>
-    <div class="footer-bottom">
-        &copy; 2024 Smile Place Hotel. All Rights Reserved.
     </div>
+</section>
 
-    <!-- สคริปต์สลับภาษา (อัปเกรดให้รองรับ 3 ภาษา) -->
+
+<section id="contact" style="background-color:#654000; color: #ffffff; text-align: center;">
+    <div style="max-width: 1100px; margin: 0 auto;">
+        
+        <h2>CONTACT US</h2>
+        
+        <div class="flex-row" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 30px; justify-content: center;">
+            
+            <div class="flex-col" style="flex: 1; text-align: left; min-width: 300px;">
+                <h3 class="lang-th" style="color: #fff; font-size: 1.3rem; margin-bottom: 10px;">โรงแรมสมายเพลส</h3>
+                <h3 class="lang-en" style="color: #fff; font-size: 1.3rem; margin-bottom: 10px; display:none;">Smile Place Hotel</h3>
+                <h3 class="lang-cn" style="color: #fff; font-size: 1.3rem; margin-bottom: 10px; display:none;">微笑广场酒店</h3>
+
+                <p class="lang-th" style="font-size: 1rem; line-height: 1.6; color: #ccc; margin-top: 0;">
+                    209/38-39 หมู่ 2 ต.ดอยแก้ว <br>
+                    อ.จอมทอง จ.เชียงใหม่ 50160
+                </p>
+                <p class="lang-en" style="font-size: 1rem; line-height: 1.6; color: #ccc; margin-top: 0; display:none;">
+                    209/38-39 Moo 2, T. Doi Kaeo <br>
+                    A. Chom Thong, Chiang Mai 50160
+                </p>
+                <p class="lang-cn" style="font-size: 1rem; line-height: 1.6; color: #ccc; margin-top: 0; display:none;">
+                    209/38-39 Moo 2, T. Doi Kaeo <br>
+                    A. Chom Thong, Chiang Mai 50160
+                </p>
+
+                <div style="margin-top: 15px;">
+                    <p style="font-size: 1.1rem; margin-bottom: 5px;">
+                        <span style="color: #d4a373;">📞</span> 053-341155, 065-7538313
+                    </p>
+                    <p style="font-size: 1.1rem; margin-bottom: 5px;">
+                        <span style="color: #d4a373;">📧</span> 
+                        <a href="mailto:smileplace2016@gmail.com" style="color: #fff; text-decoration: none;">smileplace2016@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex-col" style="flex: 1; min-width: 300px;">
+                <h3 class="lang-th" style="color: #fff; font-size: 1.3rem; margin-bottom: 15px;">ติดต่อเรา</h3>
+                <h3 class="lang-en" style="color: #fff; font-size: 1.3rem; margin-bottom: 15px; display:none;">Contact Us</h3>
+                <h3 class="lang-cn" style="color: #fff; font-size: 1.3rem; margin-bottom: 15px; display:none;">关注我们</h3>
+                
+                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <a href="https://www.facebook.com/SmileplaceChomthong/" target="_blank" style="text-decoration: none; color: #fff;">
+                        <img src="pic/CT1.png" style="width: 45px; height: 45px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));" alt="Facebook">
+                        <p style="font-size: 0.85rem; margin-top: 5px;">Facebook</p>
+                    </a>
+
+                    <a href="https://line.me/ti/p/8Sse_9k9ex" target="_blank" style="text-decoration: none; color: #fff;">
+                        <img src="pic/rs2.png" style="width: 45px; height: 45px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));" alt="Line">
+                        <p style="font-size: 0.85rem; margin-top: 5px;">Line</p>
+                    </a>
+
+                    <a href="https://www.tiktok.com/@smileplacechomthong?_r=1&_t=ZS-96C04EM3DUI" target="_blank" style="text-decoration: none; color: #fff;">
+                        <img src="pic/ct3.png" style="width: 45px; height: 45px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));" alt="Tiktok">
+                        <p style="font-size: 0.85rem; margin-top: 5px;">Tiktok</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer style="background-color: #1a1a1a; color: #666; padding: 20px; text-align: center; font-size: 0.9rem; border-top: 1px solid #333;">
+    <p style="margin: 0;">&copy; 2026 Smile Place Hotel Chom Thong. All Rights Reserved.</p>
+</footer>
+
+
     <script>
         function toggleLang(lang) {
-            // รายชื่อภาษาทั้งหมดในระบบ
             const languages = ['th', 'en', 'cn'];
-            
             languages.forEach(l => {
                 const elements = document.querySelectorAll('.lang-' + l);
                 const btn = document.getElementById('btn-' + l);
-                
                 if (l === lang) {
-                    // ภาษาที่กำลังเลือก: แสดงข้อความ และ ซ่อนปุ่มของภาษานี้
                     elements.forEach(el => el.style.display = '');
                     if (btn) btn.style.display = 'none';
                 } else {
-                    // ภาษาอื่น: ซ่อนข้อความ และ แสดงปุ่มให้กดเลือกได้
                     elements.forEach(el => el.style.display = 'none');
                     if (btn) btn.style.display = '';
                 }
